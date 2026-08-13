@@ -11,12 +11,17 @@
   <div class="search"><input id="fundSearch" placeholder="Search another mutual fund..."><div id="fundResults"></div></div>
   <a class="home-link" href="index.html">← All Funds</a>
 </header>
-<nav><a class="active" href="#overview">Overview</a><a href="#performance">Performance</a><a href="#portfolio">Portfolio</a><a href="#risk">Risk</a><a href="#compare">Compare</a><a href="index.html#calculators">Calculators</a></nav>
+<nav><a class="active" href="#overview">Overview</a><a href="#performance">Performance</a><a href="#details">Fund Details</a><a href="#portfolio">Portfolio</a><a href="#risk">Risk</a><a href="#compare">Compare</a></nav>
 
 <main>
 <section class="fund-page-hero">
-  <div><p class="eyebrow">MUTUAL FUND</p><h1 id="fundName">Loading fund…</h1><p id="fundSub">Finding scheme details</p></div>
-  <div class="live-nav-box"><small>LATEST NAV</small><b id="nav">—</b><span id="navDate">—</span></div>
+  <div>
+    <p class="eyebrow">MUTUAL FUND · FUNDWISE RESEARCH</p>
+    <h1 id="fundName">Loading fund…</h1>
+    <p id="fundSub">Finding scheme details</p>
+    <div class="hero-actions"><a href="#compare" class="primary-action">Compare Fund</a><a href="#performance" class="secondary-action">View Performance</a></div>
+  </div>
+  <div class="live-nav-box"><small>LATEST NAV</small><b id="nav">—</b><span id="navDate">—</span><em id="dataStatus">Connecting to NAV data…</em></div>
 </section>
 
 <section class="fund-metrics">
@@ -29,25 +34,60 @@
 </section>
 
 <section id="overview" class="fund-section">
- <div class="section-title"><h2>Fund Overview</h2><span id="dataStatus">Loading verified NAV data…</span></div>
+ <div class="section-title"><h2>Fund Overview</h2><span>NAV-derived data</span></div>
  <div class="overview-grid">
-  <div class="card"><h3>Fund Information</h3><dl><dt>AMC</dt><dd id="amc">—</dd><dt>Category</dt><dd id="category">—</dd><dt>Scheme Code</dt><dd id="schemeCode">—</dd><dt>Plan</dt><dd>Direct</dd><dt>Option</dt><dd>Growth</dd><dt>Benchmark</dt><dd id="benchmark">—</dd></dl></div>
-  <div class="card"><h3>₹10,000 Growth</h3><p class="muted">Illustrative comparison until benchmark/category history is connected.</p><div class="growth"><div><span>Fund</span><b id="growthFund">—</b></div><div><span>Benchmark</span><b>Data pending</b></div><div><span>Category</span><b>Data pending</b></div></div></div>
-  <div class="card"><h3>FundWise Score</h3><div class="score-big">—<small>Score available after full portfolio + benchmark data ingestion</small></div><p class="muted">We do not fabricate a score when required inputs are unavailable.</p></div>
+  <div class="card"><h3>Fund Information</h3><dl>
+   <dt>AMC</dt><dd id="amc">—</dd><dt>Category</dt><dd id="category">—</dd>
+   <dt>Scheme Code</dt><dd id="schemeCode">—</dd><dt>Plan</dt><dd>Direct</dd>
+   <dt>Option</dt><dd>Growth</dd><dt>Inception</dt><dd id="inception">—</dd>
+  </dl></div>
+  <div class="card"><h3>Investment Snapshot</h3>
+   <div class="detail-list"><div><span>Latest NAV</span><b id="nav2">—</b></div><div><span>NAV date</span><b id="navDate2">—</b></div><div><span>History available</span><b id="historySince">—</b></div><div><span>Benchmark</span><b id="benchmark">Data pending</b></div></div>
+  </div>
+  <div class="card"><h3>FundWise Score</h3><div class="score-big">—<small>Score will be enabled after portfolio, benchmark and cost data are connected.</small></div><p class="muted">We do not fabricate a score when required inputs are unavailable.</p></div>
  </div>
 </section>
 
 <section id="performance" class="fund-section">
- <div class="section-title"><h2>Historical NAV & Performance</h2><span>From NAV history</span></div>
- <div class="card"><div class="chart-controls"><button class="period active" data-days="365">1Y</button><button class="period" data-days="1095">3Y</button><button class="period" data-days="1825">5Y</button></div><div class="fund-chart"><canvas id="chart"></canvas></div></div>
+ <div class="section-title"><h2>Historical NAV & Performance</h2><span>Calculated from available NAV history</span></div>
+ <div class="card">
+  <div class="chart-controls">
+   <button class="period" data-period="1M" data-days="31">1M</button>
+   <button class="period" data-period="3M" data-days="92">3M</button>
+   <button class="period" data-period="6M" data-days="183">6M</button>
+   <button class="period active" data-period="1Y" data-days="365">1Y</button>
+   <button class="period" data-period="3Y" data-days="1095">3Y</button>
+   <button class="period" data-period="5Y" data-days="1825">5Y</button>
+   <button class="period" data-period="10Y" data-days="3650">10Y</button>
+   <button class="period" data-period="MAX" data-days="0">MAX</button>
+  </div>
+  <div class="performance-head"><div><b id="selectedPeriod">1Y</b><span> selected period</span></div><div id="periodReturn" class="period-return">Return: —</div></div>
+  <div class="fund-chart"><canvas id="chart"></canvas></div>
+  <div class="performance-note">Returns shown here are calculated from the fund's published NAV history and are not a guarantee of future performance.</div>
+ </div>
+ <div class="performance-table card">
+  <h3>Period Returns</h3>
+  <div class="return-grid">
+   <div><span>1M</span><b id="ret1M">—</b></div><div><span>3M</span><b id="ret3M">—</b></div><div><span>6M</span><b id="ret6M">—</b></div><div><span>1Y</span><b id="ret1Y">—</b></div>
+   <div><span>3Y CAGR</span><b id="ret3Y">—</b></div><div><span>5Y CAGR</span><b id="ret5Y">—</b></div><div><span>10Y CAGR</span><b id="ret10Y">—</b></div><div><span>MAX</span><b id="retMAX">—</b></div>
+  </div>
+ </div>
+</section>
+
+<section id="details" class="fund-section">
+ <div class="section-title"><h2>Fund Details</h2><span>Verified data only</span></div>
+ <div class="details-grid">
+  <div class="card"><h3>Scheme Details</h3><dl><dt>Fund house</dt><dd id="detailAmc">—</dd><dt>Category</dt><dd id="detailCategory">—</dd><dt>Plan</dt><dd>Direct</dd><dt>Option</dt><dd>Growth</dd><dt>Scheme code</dt><dd id="detailCode">—</dd><dt>Inception date</dt><dd id="detailInception">—</dd></dl></div>
+  <div class="card"><h3>Costs & Risk</h3><dl><dt>Expense ratio</dt><dd class="pending">Data source required</dd><dt>Exit load</dt><dd class="pending">Data source required</dd><dt>Risk-o-meter</dt><dd class="pending">Data source required</dd><dt>Benchmark</dt><dd class="pending">Data source required</dd></dl><p class="muted">These fields will be connected to verified AMC/AMFI or licensed data in the next data phase.</p></div>
+ </div>
 </section>
 
 <section id="portfolio" class="fund-section">
- <div class="section-title"><h2>Portfolio X-Ray</h2><span>Verified disclosure required</span></div>
+ <div class="section-title"><h2>Portfolio X-Ray</h2><span>Next data phase</span></div>
  <div class="portfolio-grid">
-  <div class="card"><h3>Asset Allocation</h3><div class="empty-state">Portfolio data will appear here after verified AMC/AMFI disclosure ingestion.</div></div>
-  <div class="card"><h3>Top Holdings</h3><div class="empty-state">Waiting for the latest portfolio disclosure.</div></div>
-  <div class="card"><h3>Sector Allocation</h3><div class="empty-state">Waiting for verified sector classification.</div></div>
+  <div class="card"><h3>Asset Allocation</h3><div class="empty-state">Equity / debt / cash allocation will appear after verified portfolio disclosure ingestion.</div></div>
+  <div class="card"><h3>Top Holdings</h3><div class="empty-state">Top 10 holdings will appear after verified portfolio disclosure ingestion.</div></div>
+  <div class="card"><h3>Sector Allocation</h3><div class="empty-state">Sector weights will appear after verified portfolio disclosure ingestion.</div></div>
  </div>
 </section>
 
@@ -55,7 +95,7 @@
  <div class="section-title"><h2>Risk & Consistency</h2><span>Calculated from NAV history</span></div>
  <div class="risk-cards">
   <div class="card"><h3>Volatility</h3><b class="risk-number" id="vol2">—</b><p class="muted">Annualised from available NAV observations.</p></div>
-  <div class="card"><h3>Sharpe Ratio</h3><b class="risk-number" id="sharpe2">—</b><p class="muted">Uses the configured risk-free assumption.</p></div>
+  <div class="card"><h3>Sharpe Ratio</h3><b class="risk-number" id="sharpe2">—</b><p class="muted">Uses a 6.5% risk-free assumption for this MVP.</p></div>
   <div class="card"><h3>Maximum Drawdown</h3><b class="risk-number" id="dd2">—</b><p class="muted">Largest peak-to-trough decline in available history.</p></div>
  </div>
 </section>
@@ -66,9 +106,11 @@
  <div id="comparison"></div>
 </section>
 
-<section class="sources"><div class="section-title"><h2>Data & Methodology</h2><span>Transparency first</span></div><p>FundWise separates verified NAV-derived analytics from data that requires portfolio, benchmark, AUM and expense-ratio disclosures. Production deployment should use appropriately licensed/authorized data sources.</p></section>
+<section class="sources"><div class="section-title"><h2>Data & Methodology</h2><span>Transparency first</span></div>
+ <div class="card"><p class="muted">Latest NAV and historical NAV are retrieved through the configured NAV data service. Returns and risk statistics are calculated from the available NAV observations. Portfolio, AUM, expense ratio, benchmark and risk-o-meter are intentionally left blank until a verified source is connected.</p></div>
+</section>
 </main>
-<footer><b>FundWise</b><span>Mutual fund research & education platform.</span><small>Not investment advice. Data may be delayed or incomplete.</small></footer>
+<footer><b>FundWise</b><span>Mutual fund research MVP</span><small>Research tool only. Not investment advice. Past performance does not guarantee future returns.</small></footer>
 <script src="fund.js"></script>
 </body>
 </html>
