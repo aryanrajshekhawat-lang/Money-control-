@@ -1,25 +1,39 @@
-return schemeSearchTimer=null;
+let schemeSearchTimer=null;
 async function searchAllSchemes(q){
  const box=document.getElementById("results"); if(!box)return;
  q=(q||"").trim();
  if(!q){box.innerHTML="";return;}
- box.innerHTML='<div class="search-loading">Searching all mutual fund schemes…</div>';
+ const lower=q.toLowerCase();
+
+ // Always show local matches immediately, so search remains usable even if
+ // the external catalogue/API is slow or temporarily unavailable.
+ const local=funds.filter(f=>(f.name+" "+f.amc+" "+f.cat).toLowerCase().includes(lower));
+ const localHtml=local.slice(0,8).map(f=>
+   `<a class="search-result-link" href="${fundUrl(f.name)}"><b>${escapeHtml(f.name)}</b><small> · ${escapeHtml(f.cat)}</small></a>`
+ ).join("");
+ box.innerHTML=localHtml || '<div class="search-loading">Searching all mutual fund schemes…</div>';
+
+ // Then enrich with the full scheme catalogue.
  try{
-   const r=await fetch("/api/schemes?q="+encodeURIComponent(q)+"&limit=40");
-   if(!r.ok)throw Error();
+   const r=await fetch("/api/schemes?q="+encodeURIComponent(q)+"&limit=40",{cache:"no-store"});
+   if(!r.ok) throw Error("API");
    const j=await r.json();
    const schemes=j.schemes||[];
-   box.innerHTML=schemes.length
-    ? schemes.map(s=>`<a class="search-result-link" href="/fund/${slugify(s.schemeName)}/"><b>${escapeHtml(s.schemeName)}</b><small> Scheme code: ${s.schemeCode}</small></a>`).join("")
-    : "<div>No matching scheme found</div>";
+   const remoteHtml=schemes
+     .filter(s=>!local.some(f=>f.name.toLowerCase()===String(s.schemeName||"").toLowerCase()))
+     .map(s=>`<a class="search-result-link" href="${fundUrl(s.schemeName)}"><b>${escapeHtml(s.schemeName)}</b><small> Scheme code: ${escapeHtml(s.schemeCode)}</small></a>`)
+     .join("");
+   if(remoteHtml) box.innerHTML=localHtml+remoteHtml;
+   else if(!localHtml) box.innerHTML="<div>No matching fund found</div>";
  }catch(e){
-   box.innerHTML="<div>Unable to search schemes right now. Try again.</div>";
+   if(!localHtml) box.innerHTML="<div>Search service is temporarily unavailable. Try one of the featured funds below.</div>";
  }
 }
 function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"}[c]));}
 const funds=[{name:"ICICI Prudential Flexicap Fund",amc:"ICICI Prudential",cat:"Flexi Cap",one:14.82,three:18.26,risk:"Moderately High"},{name:"Parag Parikh Flexi Cap Fund",amc:"PPFAS",cat:"Flexi Cap",one:16.15,three:19.42,risk:"Moderately High"},{name:"HDFC Flexi Cap Fund",amc:"HDFC",cat:"Flexi Cap",one:13.44,three:17.8,risk:"Moderately High"},{name:"ICICI Prudential Bluechip Fund",amc:"ICICI Prudential",cat:"Large Cap",one:12.6,three:16.4,risk:"Moderately High"},{name:"HDFC Mid-Cap Opportunities Fund",amc:"HDFC",cat:"Mid Cap",one:18.2,three:22.1,risk:"Very High"},{name:"Nippon India Small Cap Fund",amc:"Nippon India",cat:"Small Cap",one:21.1,three:25.3,risk:"Very High"},{name:"ICICI Prudential Balanced Advantage Fund",amc:"ICICI Prudential",cat:"Hybrid",one:10.62,three:12.87,risk:"Moderate"},{name:"SBI Balanced Advantage Fund",amc:"SBI",cat:"Hybrid",one:11.14,three:13.22,risk:"Moderate"}];
 function slugify(s){return s.toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"")}
-function fundUrl(name){return "/fund.html?name="+encodeURIComponent(name)}onunction renderFunds(list=funds){
+function fundUrl(name){return "/fund.html?name="+encodeURIComponent(name)}
+function renderFunds(list=funds){
  const grid=document.getElementById("fundGrid"); if(!grid)return;
  grid.innerHTML=list.map(f=>`<a class="fund fund-link" href="${fundUrl(f.name)}"><small>${f.amc} · ${f.cat}</small><h3>${f.name}</h3><div class="return"><div><small>1Y return</small><b class="green">${f.one.toFixed(2)}%</b></div><span class="tag">${f.risk}</span></div></a>`).join("");
 }
