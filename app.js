@@ -23,3 +23,36 @@ function sipCalc(){const p=+sip.value||0,r=(+rate.value||0)/1200,n=(+years.value
 function showSearch(q){q=q.toLowerCase();const m=funds.filter(f=>(f.name+" "+f.amc+" "+f.cat).toLowerCase().includes(q)).slice(0,5);document.getElementById("results").innerHTML=m.map(f=>`<div>${f.name}<small> · ${f.cat}</small></div>`).join("")}
 document.getElementById("search").addEventListener("input",e=>showSearch(e.target.value));
 function runHeroSearch(){showSearch(document.getElementById("heroSearch").value);document.getElementById("search").value=document.getElementById("heroSearch").value;document.getElementById("search").focus()}
+
+// --- Live NAV API integration ---
+// API documentation: https://www.mfapi.in/docs/
+// ICICI Prudential Flexicap Fund - Direct Plan - Growth: scheme code 148990.
+const MF_API="https://api.mfapi.in/mf";
+const FEATURED_SCHEME=148990;
+
+async function loadLiveFund(){
+  const status=document.getElementById("apiStatus");
+  const name=document.getElementById("liveName");
+  const nav=document.getElementById("liveNav");
+  const date=document.getElementById("liveDate");
+  status.textContent="Connecting…"; status.classList.remove("bad");
+  try{
+    const res=await fetch(`${MF_API}/${FEATURED_SCHEME}/latest`);
+    if(!res.ok) throw new Error("API request failed");
+    const json=await res.json();
+    const item=json.data && json.data[0];
+    if(!item) throw new Error("No NAV returned");
+    name.textContent=json.meta?.scheme_name || "ICICI Prudential Flexicap Fund";
+    nav.textContent="₹"+Number(item.nav).toFixed(4);
+    date.textContent="NAV date: "+item.date+" · Source: mutual-fund NAV API";
+    status.textContent="API connected";
+  }catch(err){
+    status.textContent="API unavailable";
+    status.classList.add("bad");
+    name.textContent="Unable to fetch live NAV";
+    nav.textContent="—";
+    date.textContent="Check your connection or API availability.";
+    console.error(err);
+  }
+}
+loadLiveFund();

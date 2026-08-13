@@ -27,3 +27,14 @@ Open `index.html` in a browser.
 5. Add portfolio and watchlist.
 6. Add authentication.
 7. Add compliant research/disclaimer/advertising framework.
+
+
+## API integration — v1
+
+This version connects the browser to **MFapi.in** for a live NAV lookup of:
+- Scheme: ICICI Prudential Flexicap Fund - Direct Plan - Growth
+- Scheme code: 148990
+
+The documented endpoint is `GET https://api.mfapi.in/mf/{scheme_code}/latest`.
+
+For a production website, do not rely on a free public API as the sole source of financial data. Evaluate licensing, uptime, rate limits, redistribution rights and data accuracy, and consider an authorized/licensed provider or an ingestion layer based on official AMFI/AMC disclosures. AMFI provides current and historical NAV download resources and scheme-data resources.
