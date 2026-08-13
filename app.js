@@ -10,7 +10,8 @@ const funds=[
 
 const grid=document.getElementById("fundGrid");
 function renderFunds(list=funds){
- grid.innerHTML=list.slice(0,8).map((f,i)=>`<div class="fund" onclick="openScheme(${i})"><small>${f.amc} · ${f.cat}</small><h3>${f.name}</h3><div class="return"><div><small>1Y return</small><b class="green">${f.one.toFixed(2)}%</b></div><span class="tag">${f.risk}</span></div></div>`).join("")
+ grid.innerHTML=list.slice(0,8).map((f,i)=>`<div class="fund" onclick="location.href='/fund/'+f.name.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')"><small>${f.amc} · ${f.cat}</small><h3>${f.name}</h3><div class="return"><div><small>1Y return</small><b class="green">${f.one.toFixed(2)}%</b></div><span class="tag">${f.risk}</span></div></div>`).join("")
+})"><small>${f.amc} · ${f.cat}</small><h3>${f.name}</h3><div class="return"><div><small>1Y return</small><b class="green">${f.one.toFixed(2)}%</b></div><span class="tag">${f.risk}</span></div></div>`).join("")
 } · ${f.cat}</small><h3>${f.name}</h3><div class="return"><div><small>1Y return</small><b class="green">${f.one.toFixed(2)}%</b></div><span class="tag">${f.risk}</span></div></div>`).join("")}
 renderFunds();
 
@@ -25,7 +26,7 @@ function sipCalc(){const p=+sip.value||0,r=(+rate.value||0)/1200,n=(+years.value
 function showSearch(q){
  q=q.toLowerCase().trim();
  const m=funds.map((f,i)=>({f,i})).filter(x=>(x.f.name+" "+x.f.amc+" "+x.f.cat).toLowerCase().includes(q)).slice(0,8);
- document.getElementById("results").innerHTML=m.length ? m.map(x=>`<div class="search-result-link" onclick="openScheme(${x.i})">${x.f.name}<small> · ${x.f.cat}</small></div>`).join("") : (q?'<div>No matching fund found</div>':'');
+ document.getElementById("results").innerHTML=m.length ? m.map(x=>`<div class="search-result-link" onclick="location.href='/fund/'+x.f.name.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')">${x.f.name}<small> · ${x.f.cat}</small></div>`).join("") : (q?'<div>No matching fund found</div>':'');
 }
 document.getElementById("search").addEventListener("input",e=>showSearch(e.target.value));
 function runHeroSearch(){showSearch(document.getElementById("heroSearch").value);document.getElementById("search").value=document.getElementById("heroSearch").value;document.getElementById("search").focus()}

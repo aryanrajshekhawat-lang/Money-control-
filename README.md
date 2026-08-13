@@ -66,3 +66,17 @@ The current research values are illustrative placeholders except for NAV/history
 - Portfolio, AUM, TER, benchmark, manager and risk-o-meter are intentionally not fabricated. The next production ingestion adapter should use verified AMC/AMFI/SEBI disclosures and an appropriate data licence.
 
 AMFI states that scheme NAVs are published daily and provides NAV history downloads; its research/data area also exposes scheme details, scheme performance and portfolio-disclosure resources. SEBI's March 2026 Master Circular requires monthly portfolio disclosures with ISINs on AMC/AMFI websites within the prescribed timeline.
+
+\n## v7 multi-page architecture
+- Home page is now a discovery/dashboard page.
+- `fund.html?name=...` is a dedicated fund-detail page.
+- Search results navigate to the separate fund page.
+- Popular fund cards navigate to the separate fund page.
+- Fund detail contains NAV, performance, risk, portfolio placeholder, comparison and methodology sections.
+- This structure is ready for clean URLs later (for example `/fund/icici-prudential-flexicap-fund`) once routing is added.
+
+\n## v8 clean fund URLs
+Fund pages now use clean URLs such as:
+`/fund/icici-prudential-flexicap-fund`
+
+Vercel rewrites the clean URL to the existing `fund.html` page while the client resolves the fund slug. This keeps the implementation simple while providing a professional URL structure.
