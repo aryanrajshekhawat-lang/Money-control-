@@ -2,73 +2,190 @@
 <html lang="en">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>FundWise — SBI Balanced Advantage Fund</title><link rel="canonical" href="/fund/sbi-balanced-advantage-fund/">
-<link rel="stylesheet" href="../../styles.css">
+<title>FundWise — Mutual Fund Research</title>
+<link rel="stylesheet" href="styles.css">
 </head>
-<body>
+<body class="home-page">
 <header>
-  <a class="brand" href="index.html">Fund<span>Wise</span></a>
-  <div class="search"><input id="fundSearch" placeholder="Search another mutual fund..."><div id="fundResults"></div></div>
-  <a class="home-link" href="index.html">← All Funds</a>
+  <div class="brand">Fund<span>Wise</span></div>
+  <div class="search"><input id="search" placeholder="Search mutual funds, AMCs, categories..."><div id="results"></div></div>
+  <button class="signin">Sign In</button>
 </header>
-<nav><a class="active" href="#overview">Overview</a><a href="#performance">Performance</a><a href="#portfolio">Portfolio</a><a href="#risk">Risk</a><a href="#compare">Compare</a><a href="index.html#calculators">Calculators</a></nav>
+<div class="data-banner"><b>Stage 1 data:</b> Search covers the full upstream mutual-fund scheme catalogue; NAV/history loads when you open a scheme.</div>
+<nav><a class="active" href="#home">Home</a><a href="#funds">Explore Funds</a><a href="#compare">Compare</a><a href="#screener">Screener</a><a href="#calculators">Calculators</a><a href="#learn">Learn</a></nav>
 
-<main>
-<section class="fund-page-hero">
-  <div><p class="eyebrow">MUTUAL FUND</p><h1 id="fundName">Loading fund…</h1><p id="fundSub">Finding scheme details</p></div>
-  <div class="live-nav-box"><small>LATEST NAV</small><b id="nav">—</b><span id="navDate">—</span></div>
+<main id="home">
+<section class="hero">
+ <div><p class="eyebrow">MUTUAL FUND RESEARCH PLATFORM</p><h1>Invest with better<br><span>fund intelligence.</span></h1>
+ <p class="sub">Research mutual funds, compare schemes, understand risk and calculate your SIP — all in one place.</p>
+ <div class="hero-search"><input id="heroSearch" placeholder="Search a fund, e.g. Flexi Cap"><button onclick="runHeroSearch()">Search</button></div></div>
+ <div class="hero-card"><small>Featured research</small><h3>What makes a good mutual fund?</h3><div class="score"><b>Consistency</b><strong>8.6/10</strong></div><div class="bar"><i style="width:86%"></i></div><div class="score"><b>Risk-adjusted return</b><strong>8.1/10</strong></div><div class="bar"><i style="width:81%"></i></div><p>Compare returns with risk, benchmark and category — not returns alone.</p></div>
 </section>
 
-<section class="fund-metrics">
-  <div><small>1Y RETURN</small><b id="oneY">—</b></div>
-  <div><small>3Y CAGR</small><b id="threeY">—</b></div>
-  <div><small>5Y CAGR</small><b id="fiveY">—</b></div>
-  <div><small>VOLATILITY</small><b id="volatility">—</b></div>
-  <div><small>SHARPE</small><b id="sharpe">—</b></div>
-  <div><small>MAX DRAWDOWN</small><b id="drawdown">—</b></div>
+<section class="quick">
+<div><small>FUNDS TRACKED</small><b>1,500+</b></div><div><small>AMCs</small><b>40+</b></div><div><small>CATEGORIES</small><b>30+</b></div><div><small>TOOLS</small><b>10+</b></div>
 </section>
 
-<section id="overview" class="fund-section">
- <div class="section-title"><h2>Fund Overview</h2><span id="dataStatus">Loading verified NAV data…</span></div>
- <div class="overview-grid">
-  <div class="card"><h3>Fund Information</h3><dl><dt>AMC</dt><dd id="amc">—</dd><dt>Category</dt><dd id="category">—</dd><dt>Scheme Code</dt><dd id="schemeCode">—</dd><dt>Plan</dt><dd>Direct</dd><dt>Option</dt><dd>Growth</dd><dt>Benchmark</dt><dd id="benchmark">—</dd></dl></div>
-  <div class="card"><h3>₹10,000 Growth</h3><p class="muted">Illustrative comparison until benchmark/category history is connected.</p><div class="growth"><div><span>Fund</span><b id="growthFund">—</b></div><div><span>Benchmark</span><b>Data pending</b></div><div><span>Category</span><b>Data pending</b></div></div></div>
-  <div class="card"><h3>FundWise Score</h3><div class="score-big">—<small>Score available after full portfolio + benchmark data ingestion</small></div><p class="muted">We do not fabricate a score when required inputs are unavailable.</p></div>
+<section class="live"><div class="live-title"><div><p class="eyebrow">LIVE API CONNECTION</p><h2>Live NAV Lookup</h2><span>Powered by a mutual-fund NAV API for this MVP.</span></div><div id="apiStatus" class="status">Checking API…</div></div>
+<div class="livebox"><div><small>ICICI PRUDENTIAL FLEXICAP FUND — DIRECT GROWTH</small><h3 id="liveName">Loading…</h3><div class="live-nav" id="liveNav">—</div><div id="liveDate">Fetching latest NAV…</div></div><button onclick="loadLiveFund()">Refresh NAV</button></div></section>
+<section id="funds"><div class="head"><h2>Popular Mutual Funds</h2><a href="#screener">Explore all →</a></div><div class="fundgrid" id="fundGrid"></div></section>
+
+<section id="compare" class="block"><div class="head"><h2>Compare Funds</h2><span>Select funds to compare side by side</span></div>
+<div class="comparebox"><select id="fundA"></select><select id="fundB"></select><button onclick="compareFunds()">Compare</button></div><div id="comparison"></div></section>
+
+<section id="screener" class="block"><div class="head"><h2>Mutual Fund Screener</h2><span>Filter funds by what matters to you</span></div>
+<div class="filters"><select id="cat"><option value="">All categories</option><option>Flexi Cap</option><option>Large Cap</option><option>Mid Cap</option><option>Small Cap</option><option>Hybrid</option></select><select id="sort"><option value="return">1Y return</option><option value="three">3Y CAGR</option><option value="risk">Risk</option></select><button onclick="screenFunds()">Apply</button></div><div class="table" id="screenTable"></div></section>
+
+<section id="calculators" class="block"><div class="head"><h2>SIP Calculator</h2><span>Illustrative calculation</span></div>
+<div class="calc"><div><label>Monthly SIP</label><input id="sip" type="number" value="10000"></div><div><label>Expected return %</label><input id="rate" type="number" value="12"></div><div><label>Years</label><input id="years" type="number" value="10"></div><button onclick="sipCalc()">Calculate</button><div class="answer"><small>Estimated value</small><b id="sipOut">₹23.23 Lakh</b></div></div></section>
+
+<section id="learn" class="learn"><div class="head"><h2>Learn Mutual Funds</h2></div><div class="articles"><article><b>NAV vs return: what should you actually look at?</b><small>Fund basics · 5 min read</small></article><article><b>Why risk-adjusted return matters</b><small>Research · 6 min read</small></article><article><b>SIP, lumpsum and the power of compounding</b><small>Investing · 4 min read</small></article></div></section>
+
+
+<section id="schemePage" class="scheme-page" hidden>
+  <button class="back-btn" onclick="closeScheme()">← Back to funds</button>
+  <div class="scheme-hero">
+    <div>
+      <p class="eyebrow">MUTUAL FUND DETAIL</p>
+      <h2 id="schemeTitle">Fund</h2>
+      <p id="schemeSub">Direct Plan · Growth</p>
+    </div>
+    <div class="scheme-nav"><small>Latest NAV</small><b id="schemeNAV">Loading…</b><span id="schemeNAVDate">—</span></div>
+  </div>
+  <div class="scheme-metrics">
+    <div><small>1Y RETURN</small><b id="s1">—</b></div>
+    <div><small>3Y CAGR</small><b id="s3">—</b></div>
+    <div><small>AUM</small><b id="sAUM">—</b></div>
+    <div><small>RISK</small><b id="sRisk">—</b></div>
+  </div>
+  <div class="scheme-grid">
+    <div class="detail-card">
+      <div class="card-head"><h3>Historical NAV</h3><span>Latest available history</span></div>
+      <div class="chart-large"><canvas id="schemeChart"></canvas></div>
+    </div>
+    <div class="detail-card">
+      <h3>Fund Information</h3>
+      <dl>
+        <dt>AMC</dt><dd id="sAMC">—</dd>
+        <dt>Category</dt><dd id="sCat">—</dd>
+        <dt>Benchmark</dt><dd id="sBenchmark">—</dd>
+        <dt>Plan</dt><dd>Direct</dd>
+        <dt>Option</dt><dd>Growth</dd>
+      </dl>
+    </div>
+  </div>
+  <div class="detail-card">
+    <div class="card-head"><h3>Performance & Risk</h3><span>Illustrative until production data is connected</span></div>
+    <div class="riskgrid">
+      <div><small>Alpha</small><b>—</b></div><div><small>Beta</small><b>—</b></div>
+      <div><small>Sharpe</small><b>—</b></div><div><small>Sortino</small><b>—</b></div>
+      <div><small>Volatility</small><b>—</b></div><div><small>Max Drawdown</small><b>—</b></div>
+    </div>
+  </div>
+  <p class="disclaimer">NAV and historical NAV are fetched from the configured NAV API. Other analytics require verified production data sources.</p>
+</section>
+<section id="fundDetail" class="detail">
+  <div class="detail-top">
+    <div>
+      <p class="eyebrow">FUND DETAIL</p>
+      <h2 id="detailName">ICICI Prudential Flexicap Fund</h2>
+      <p id="detailMeta">Direct Plan · Growth · Flexi Cap</p>
+    </div>
+    <div class="navbox"><small>Latest NAV</small><b id="detailNav">Loading…</b><span id="detailDate">—</span></div>
+  </div>
+  <div class="metrics">
+    <div><small>1Y RETURN</small><b class="green">14.82%</b></div>
+    <div><small>3Y CAGR</small><b class="green">18.26%</b></div>
+    <div><small>5Y CAGR</small><b class="green">17.91%</b></div>
+    <div><small>AUM</small><b>₹75,000 Cr</b></div>
+    <div><small>EXPENSE RATIO</small><b>0.74%</b></div>
+    <div><small>RISK</small><b>Very High</b></div>
+  </div>
+
+  <div class="detail-grid">
+    <div class="detail-main">
+      <div class="detail-card">
+        <div class="card-head"><h3>Historical NAV</h3><select id="period"><option>1 Year</option><option>3 Years</option><option>5 Years</option></select></div>
+        <div class="chart-large"><canvas id="navChart"></canvas></div>
+      </div>
+      <div class="detail-card">
+        <div class="card-head"><h3>Performance</h3><span>Annualised</span></div>
+        <div class="perf"><div><span>1 Year</span><b>14.82%</b></div><div><span>3 Years</span><b>18.26%</b></div><div><span>5 Years</span><b>17.91%</b></div><div><span>10 Years</span><b>16.84%</b></div></div>
+      </div>
+      <div class="detail-card">
+        <div class="card-head"><h3>Risk & Return Analysis</h3><span>Illustrative</span></div>
+        <div class="riskgrid"><div><small>Alpha</small><b>2.84%</b></div><div><small>Beta</small><b>0.91</b></div><div><small>Sharpe</small><b>1.12</b></div><div><small>Sortino</small><b>1.58</b></div><div><small>Volatility</small><b>14.7%</b></div><div><small>Max Drawdown</small><b>-17.3%</b></div></div>
+      </div>
+    </div>
+    <aside>
+      <div class="detail-card"><h3>Fund Information</h3><dl><dt>Fund House</dt><dd>ICICI Prudential Mutual Fund</dd><dt>Category</dt><dd>Flexi Cap</dd><dt>Benchmark</dt><dd>NIFTY 500 TRI</dd><dt>Fund Manager</dt><dd>Fund manager details</dd><dt>Inception</dt><dd>May 1998</dd><dt>Plan</dt><dd>Direct</dd><dt>Option</dt><dd>Growth</dd></dl></div>
+      <div class="detail-card"><h3>Asset Allocation</h3><div class="alloc"><div><span>Large Cap</span><b>64%</b></div><div><span>Mid Cap</span><b>21%</b></div><div><span>Small Cap</span><b>10%</b></div><div><span>Cash/Others</span><b>5%</b></div></div></div>
+      <div class="detail-card"><h3>Top Holdings</h3><ol class="holdings"><li>ICICI Bank <b>8.4%</b></li><li>HDFC Bank <b>7.1%</b></li><li>Reliance Industries <b>6.5%</b></li><li>Infosys <b>4.8%</b></li><li>Larsen & Toubro <b>4.2%</b></li></ol></div>
+    </aside>
+  </div>
+  
+<div class="research-suite">
+  <div class="research-title">
+    <div><p class="eyebrow">FUNDWISE RESEARCH</p><h3>Deeper fund analysis</h3></div>
+    <span>Decision-support analytics — not a recommendation</span>
+  </div>
+
+  <div class="research-tabs">
+    <button class="r-tab active" onclick="showResearch('overview',this)">Overview</button>
+    <button class="r-tab" onclick="showResearch('portfolio',this)">Portfolio X-Ray</button>
+    <button class="r-tab" onclick="showResearch('risk',this)">Risk & Consistency</button>
+    <button class="r-tab" onclick="showResearch('compare',this)">Compare</button>
+  </div>
+
+  <div id="research-overview" class="research-panel">
+    <div class="score-grid">
+      <div class="fund-score"><small>FUNDWISE SCORE</small><b id="fwScore">8.4</b><span>/ 10</span><div class="score-ring"><i id="scoreFill"></i></div></div>
+      <div><small>Consistency</small><div class="mini-meter"><i style="width:88%"></i></div><b>8.8/10</b></div>
+      <div><small>Risk-adjusted return</small><div class="mini-meter"><i style="width:82%"></i></div><b>8.2/10</b></div>
+      <div><small>Downside protection</small><div class="mini-meter"><i style="width:79%"></i></div><b>7.9/10</b></div>
+      <div><small>Cost efficiency</small><div class="mini-meter"><i style="width:85%"></i></div><b>8.5/10</b></div>
+    </div>
+    <div class="growth-card">
+      <div class="card-head"><h3>₹10,000 Growth</h3><span>Illustrative 5-year comparison</span></div>
+      <div class="growth-values"><div><small>Fund</small><b id="growthFund">₹23,100</b></div><div><small>Benchmark</small><b id="growthBench">₹20,900</b></div><div><small>Category</small><b id="growthCat">₹21,700</b></div></div>
+      <div class="growth-bars"><div><span>Fund</span><i id="barFund"></i></div><div><span>Benchmark</span><i id="barBench"></i></div><div><span>Category</span><i id="barCat"></i></div></div>
+    </div>
+  </div>
+
+  <div id="research-portfolio" class="research-panel" hidden>
+    <div class="xray-grid">
+      <div class="detail-card"><h3>Asset Allocation</h3><div class="donut"><i></i><b id="equityPct">95%</b></div><div class="legend"><span>Equity <b>95%</b></span><span>Debt/Cash <b>5%</b></span></div></div>
+      <div class="detail-card"><h3>Market Cap</h3><div class="capbar"><i style="width:64%"></i><i style="width:21%"></i><i style="width:10%"></i><i style="width:5%"></i></div><div class="legend"><span>Large <b>64%</b></span><span>Mid <b>21%</b></span><span>Small <b>10%</b></span><span>Other <b>5%</b></span></div></div>
+      <div class="detail-card"><h3>Top Holdings</h3><ol class="holdings"><li>ICICI Bank <b>8.4%</b></li><li>HDFC Bank <b>7.1%</b></li><li>Reliance Industries <b>6.5%</b></li><li>Infosys <b>4.8%</b></li><li>Larsen & Toubro <b>4.2%</b></li></ol></div>
+      <div class="detail-card"><h3>Sector Exposure</h3><div class="sector"><span>Financial Services <b>27%</b></span><i style="width:27%"></i><span>Technology <b>12%</b></span><i style="width:12%"></i><span>Industrials <b>10%</b></span><i style="width:10%"></i><span>Consumer <b>9%</b></span><i style="width:9%"></i></div></div>
+    </div>
+  </div>
+
+  <div id="research-risk" class="research-panel" hidden>
+    <div class="consistency-grid">
+      <div class="detail-card"><h3>Rolling Return Consistency</h3><div class="big-stat">78% <small>of 5Y rolling periods beat benchmark</small></div><div class="timeline"><i style="width:78%"></i></div><p>Use rolling periods to reduce the distortion caused by selecting a single start date.</p></div>
+      <div class="detail-card"><h3>Maximum Drawdown</h3><div class="drawdown"><b>-17.3%</b><span>Fund</span><b>-22.4%</b><span>Benchmark</span></div><p>Lower drawdown indicates better historical downside containment, but does not predict future losses.</p></div>
+    </div>
+    <div class="detail-card"><h3>Return vs Risk</h3><div class="riskmatrix"><div class="dot d1">Fund</div><div class="axis x">Risk →</div><div class="axis y">Return ↑</div></div></div>
+  </div>
+
+  <div id="research-compare" class="research-panel" hidden>
+    <div class="compare-pro"><select id="proA"></select><select id="proB"></select><button onclick="runProCompare()">Compare</button></div>
+    <div id="proCompareTable" class="pro-table"></div>
+  </div>
+</div>
+<p class="disclaimer">Illustrative analytics and portfolio figures shown in this MVP are sample values. Production figures must come from verified, current and appropriately licensed/authorized sources.</p>
+</section>
+
+<section class="sources">
+ <div class="head"><h2>Data & Methodology</h2><span>Transparency first</span></div>
+ <div class="source-grid">
+  <div><b>NAV & history</b><p>Fetched through the FundWise data service. AMFI publishes scheme NAVs daily and provides NAV history downloads.</p><a href="https://www.amfiindia.com/net-asset-value/nav-download" target="_blank" rel="noopener">AMFI NAV resources →</a></div>
+  <div><b>Portfolio disclosures</b><p>Portfolio data should be ingested from verified AMC/AMFI disclosures. SEBI's 2026 Master Circular requires monthly portfolio disclosure with ISINs within the prescribed timeline.</p><a href="https://www.amfiindia.com/online-center/portfolio-disclosure" target="_blank" rel="noopener">AMFI portfolio disclosures →</a></div>
+  <div><b>Research methodology</b><p>CAGR, volatility, Sharpe and drawdown are calculated from NAV history. Benchmark and portfolio metrics are not fabricated when verified data is unavailable.</p></div>
  </div>
 </section>
-
-<section id="performance" class="fund-section">
- <div class="section-title"><h2>Historical NAV & Performance</h2><span>From NAV history</span></div>
- <div class="card"><div class="chart-controls"><button class="period active" data-days="365">1Y</button><button class="period" data-days="1095">3Y</button><button class="period" data-days="1825">5Y</button></div><div class="fund-chart"><canvas id="chart"></canvas></div></div>
-</section>
-
-<section id="portfolio" class="fund-section">
- <div class="section-title"><h2>Portfolio X-Ray</h2><span>Verified disclosure required</span></div>
- <div class="portfolio-grid">
-  <div class="card"><h3>Asset Allocation</h3><div class="empty-state">Portfolio data will appear here after verified AMC/AMFI disclosure ingestion.</div></div>
-  <div class="card"><h3>Top Holdings</h3><div class="empty-state">Waiting for the latest portfolio disclosure.</div></div>
-  <div class="card"><h3>Sector Allocation</h3><div class="empty-state">Waiting for verified sector classification.</div></div>
- </div>
-</section>
-
-<section id="risk" class="fund-section">
- <div class="section-title"><h2>Risk & Consistency</h2><span>Calculated from NAV history</span></div>
- <div class="risk-cards">
-  <div class="card"><h3>Volatility</h3><b class="risk-number" id="vol2">—</b><p class="muted">Annualised from available NAV observations.</p></div>
-  <div class="card"><h3>Sharpe Ratio</h3><b class="risk-number" id="sharpe2">—</b><p class="muted">Uses the configured risk-free assumption.</p></div>
-  <div class="card"><h3>Maximum Drawdown</h3><b class="risk-number" id="dd2">—</b><p class="muted">Largest peak-to-trough decline in available history.</p></div>
- </div>
-</section>
-
-<section id="compare" class="fund-section">
- <div class="section-title"><h2>Compare This Fund</h2><span>Choose another scheme</span></div>
- <div class="card compare-box"><select id="otherFund"></select><button onclick="compareSelected()">Compare</button></div>
- <div id="comparison"></div>
-</section>
-
-<section class="sources"><div class="section-title"><h2>Data & Methodology</h2><span>Transparency first</span></div><p>FundWise separates verified NAV-derived analytics from data that requires portfolio, benchmark, AUM and expense-ratio disclosures. Production deployment should use appropriately licensed/authorized data sources.</p></section>
 </main>
-<footer><b>FundWise</b><span>Mutual fund research & education platform.</span><small>Not investment advice. Data may be delayed or incomplete.</small></footer>
-<script src="../../fund.js"></script>
-</body>
-</html>
+<footer><b>FundWise</b><span>Mutual fund research & education platform.</span><small>Demo data is illustrative. FundWise is not providing investment advice in this MVP.</small></footer>
+<script src="app.js"></script>
+</body></html>

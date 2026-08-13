@@ -80,3 +80,23 @@ Fund pages now use clean URLs such as:
 `/fund/icici-prudential-flexicap-fund`
 
 Vercel rewrites the clean URL to the existing `fund.html` page while the client resolves the fund slug. This keeps the implementation simple while providing a professional URL structure.
+
+
+## v9 navigation fix
+Search and fund cards now navigate to real static pages at `/fund/<fund-slug>/`. Each built-in fund has its own `index.html`, so the fund opens as a separate page without depending on a rewrite rule. The homepage JavaScript was rebuilt to remove the previous broken navigation code.
+
+
+## v10 navigation
+Search, fund cards and screener rows use native HTML links to `/fund/<slug>/`. Each built-in fund has a physical `fund/<slug>/index.html` page, so navigation does not depend on JavaScript click handlers or Vercel rewrites.
+
+
+## Stage 1 — All-fund NAV platform
+- Search now queries the full mutual-fund scheme catalogue through `/api/schemes`.
+- Any matching scheme can open a dedicated `/fund/<slug>/` detail page.
+- The detail page resolves the scheme code and retrieves NAV history through the backend `/api/fund` endpoint.
+- NAV-derived 1Y/3Y/5Y CAGR, volatility, Sharpe and maximum drawdown are calculated server-side.
+- Featured cards remain local for fast homepage rendering.
+- Data is cached server-side to reduce upstream traffic.
+- Stage 1 deliberately focuses on NAV/history/returns rather than paid portfolio/AUM/holdings data.
+
+AMFI publishes latest NAV and historical NAV resources; NAVs are disclosed on business days. This product should label the value as "Latest NAV", not intraday real-time price.

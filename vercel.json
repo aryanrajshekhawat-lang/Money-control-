@@ -2,6 +2,19 @@
   "functions": {
     "api/fund.js": {
       "runtime": "nodejs20.x"
+    },
+    "api/schemes.js": {
+      "runtime": "nodejs20.x"
     }
-  }
+  },
+  "rewrites": [
+    {
+      "source": "/fund/:slug/",
+      "destination": "/fund.html?name=:slug"
+    },
+    {
+      "source": "/fund/:slug",
+      "destination": "/fund.html?name=:slug"
+    }
+  ]
 }
