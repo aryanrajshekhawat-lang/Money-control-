@@ -1,4 +1,4 @@
-let schemeSearchTimer=null;
+return schemeSearchTimer=null;
 async function searchAllSchemes(q){
  const box=document.getElementById("results"); if(!box)return;
  q=(q||"").trim();
@@ -19,8 +19,7 @@ async function searchAllSchemes(q){
 function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"}[c]));}
 const funds=[{name:"ICICI Prudential Flexicap Fund",amc:"ICICI Prudential",cat:"Flexi Cap",one:14.82,three:18.26,risk:"Moderately High"},{name:"Parag Parikh Flexi Cap Fund",amc:"PPFAS",cat:"Flexi Cap",one:16.15,three:19.42,risk:"Moderately High"},{name:"HDFC Flexi Cap Fund",amc:"HDFC",cat:"Flexi Cap",one:13.44,three:17.8,risk:"Moderately High"},{name:"ICICI Prudential Bluechip Fund",amc:"ICICI Prudential",cat:"Large Cap",one:12.6,three:16.4,risk:"Moderately High"},{name:"HDFC Mid-Cap Opportunities Fund",amc:"HDFC",cat:"Mid Cap",one:18.2,three:22.1,risk:"Very High"},{name:"Nippon India Small Cap Fund",amc:"Nippon India",cat:"Small Cap",one:21.1,three:25.3,risk:"Very High"},{name:"ICICI Prudential Balanced Advantage Fund",amc:"ICICI Prudential",cat:"Hybrid",one:10.62,three:12.87,risk:"Moderate"},{name:"SBI Balanced Advantage Fund",amc:"SBI",cat:"Hybrid",one:11.14,three:13.22,risk:"Moderate"}];
 function slugify(s){return s.toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"")}
-function fundUrl(name){return "/fund/"+slugify(name)+"/"}
-function renderFunds(list=funds){
+function fundUrl(name){return "/fund.html?name="+encodeURIComponent(name)}onunction renderFunds(list=funds){
  const grid=document.getElementById("fundGrid"); if(!grid)return;
  grid.innerHTML=list.map(f=>`<a class="fund fund-link" href="${fundUrl(f.name)}"><small>${f.amc} · ${f.cat}</small><h3>${f.name}</h3><div class="return"><div><small>1Y return</small><b class="green">${f.one.toFixed(2)}%</b></div><span class="tag">${f.risk}</span></div></a>`).join("");
 }
