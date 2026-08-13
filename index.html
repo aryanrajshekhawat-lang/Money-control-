@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MarketPulse — Markets, Stocks & Mutual Funds</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">Market<span>Pulse</span></div>
+    <div class="search"><input id="searchInput" placeholder="Search stocks, mutual funds, indices..." autocomplete="off"><div id="searchResults"></div></div>
+    <button class="login">Sign In</button>
+  </header>
+
+  <nav class="nav">
+    <a class="active" href="#markets">Markets</a>
+    <a href="#stocks">Stocks</a>
+    <a href="#mutualfunds">Mutual Funds</a>
+    <a href="#ipo">IPO</a>
+    <a href="#news">News</a>
+    <a href="#tools">Tools</a>
+  </nav>
+
+  <main>
+    <section class="ticker">
+      <div><small>NIFTY 50</small><strong>24,836.30</strong><em class="up">+0.42%</em></div>
+      <div><small>SENSEX</small><strong>81,441.20</strong><em class="up">+0.38%</em></div>
+      <div><small>BANK NIFTY</small><strong>55,102.75</strong><em class="down">-0.16%</em></div>
+      <div><small>USD/INR</small><strong>87.18</strong><em class="down">-0.08%</em></div>
+      <div><small>GOLD</small><strong>₹1,01,240</strong><em class="up">+0.21%</em></div>
+    </section>
+
+    <section id="markets" class="hero-grid">
+      <div class="panel market-panel">
+        <div class="panel-head"><h2>Market Overview</h2><span>Demo data</span></div>
+        <div class="market-tabs"><button class="selected">NIFTY</button><button>SENSEX</button><button>BANK NIFTY</button></div>
+        <div class="price-row"><div><div class="big-price">24,836.30</div><div class="up">▲ 103.45 (0.42%)</div></div><div class="session">Market closed<br><small>Last updated 3:30 PM</small></div></div>
+        <div class="chart-wrap"><canvas id="chart"></canvas></div>
+      </div>
+      <div class="panel">
+        <div class="panel-head"><h2>Top Movers</h2><span>Today</span></div>
+        <div id="movers"></div>
+      </div>
+    </section>
+
+    <section id="stocks" class="section">
+      <div class="section-head"><h2>Popular Stocks</h2><a href="#">View all →</a></div>
+      <div class="cards" id="stocksGrid"></div>
+    </section>
+
+    <section id="mutualfunds" class="section">
+      <div class="section-head"><h2>Mutual Funds</h2><a href="#">Explore funds →</a></div>
+      <div class="fund-table">
+        <div class="fund-row head"><span>Fund</span><span>1Y Return</span><span>3Y CAGR</span><span>Rating</span></div>
+        <div class="fund-row"><span>Flexi Cap Fund</span><b class="up">+14.82%</b><b class="up">18.26%</b><span>★★★★★</span></div>
+        <div class="fund-row"><span>Large & Mid Cap Fund</span><b class="up">+16.40%</b><b class="up">19.11%</b><span>★★★★☆</span></div>
+        <div class="fund-row"><span>Value Discovery Fund</span><b class="up">+11.94%</b><b class="up">17.38%</b><span>★★★★★</span></div>
+        <div class="fund-row"><span>Balanced Advantage Fund</span><b class="up">+10.62%</b><b class="up">12.87%</b><span>★★★★☆</span></div>
+      </div>
+    </section>
+
+    <section id="ipo" class="section two-col">
+      <div class="panel">
+        <div class="section-head"><h2>IPO Watch</h2><a href="#">All IPOs →</a></div>
+        <div class="ipo-card"><div><b>Example Technologies Ltd.</b><small>Issue closes 18 Aug 2026</small></div><strong>₹680–715</strong><span class="tag">OPEN</span></div>
+        <div class="ipo-card"><div><b>Consumer Growth Ltd.</b><small>Expected listing 21 Aug 2026</small></div><strong>₹410–430</strong><span class="tag grey">UPCOMING</span></div>
+      </div>
+      <div class="panel" id="news">
+        <div class="section-head"><h2>Latest Market News</h2><a href="#">More →</a></div>
+        <article><b>Markets edge higher as investors track earnings and global cues</b><small>2 hours ago · Markets</small></article>
+        <article><b>Mutual fund flows remain resilient amid changing market valuations</b><small>4 hours ago · Mutual Funds</small></article>
+        <article><b>Banking stocks in focus after latest credit-growth data</b><small>6 hours ago · Banking</small></article>
+      </div>
+    </section>
+
+    <section id="tools" class="section">
+      <div class="section-head"><h2>Financial Calculators</h2></div>
+      <div class="calculator">
+        <div><label>Monthly SIP (₹)</label><input id="sip" type="number" value="10000"></div>
+        <div><label>Expected return (%)</label><input id="rate" type="number" value="12"></div>
+        <div><label>Period (years)</label><input id="years" type="number" value="10"></div>
+        <button onclick="calculateSIP()">Calculate</button>
+        <div class="result"><small>Estimated value</small><strong id="sipResult">₹23.23 Lakh</strong></div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <b>MarketPulse</b><span>Independent financial information platform demo.</span>
+    <small>Market prices and fund returns shown here are sample data and are not investment advice.</small>
+  </footer>
+  <script src="app.js"></script>
+</body>
+</html>
