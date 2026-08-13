@@ -40,6 +40,49 @@
 
 <section id="learn" class="learn"><div class="head"><h2>Learn Mutual Funds</h2></div><div class="articles"><article><b>NAV vs return: what should you actually look at?</b><small>Fund basics · 5 min read</small></article><article><b>Why risk-adjusted return matters</b><small>Research · 6 min read</small></article><article><b>SIP, lumpsum and the power of compounding</b><small>Investing · 4 min read</small></article></div></section>
 
+
+<section id="schemePage" class="scheme-page" hidden>
+  <button class="back-btn" onclick="closeScheme()">← Back to funds</button>
+  <div class="scheme-hero">
+    <div>
+      <p class="eyebrow">MUTUAL FUND DETAIL</p>
+      <h2 id="schemeTitle">Fund</h2>
+      <p id="schemeSub">Direct Plan · Growth</p>
+    </div>
+    <div class="scheme-nav"><small>Latest NAV</small><b id="schemeNAV">Loading…</b><span id="schemeNAVDate">—</span></div>
+  </div>
+  <div class="scheme-metrics">
+    <div><small>1Y RETURN</small><b id="s1">—</b></div>
+    <div><small>3Y CAGR</small><b id="s3">—</b></div>
+    <div><small>AUM</small><b id="sAUM">—</b></div>
+    <div><small>RISK</small><b id="sRisk">—</b></div>
+  </div>
+  <div class="scheme-grid">
+    <div class="detail-card">
+      <div class="card-head"><h3>Historical NAV</h3><span>Latest available history</span></div>
+      <div class="chart-large"><canvas id="schemeChart"></canvas></div>
+    </div>
+    <div class="detail-card">
+      <h3>Fund Information</h3>
+      <dl>
+        <dt>AMC</dt><dd id="sAMC">—</dd>
+        <dt>Category</dt><dd id="sCat">—</dd>
+        <dt>Benchmark</dt><dd id="sBenchmark">—</dd>
+        <dt>Plan</dt><dd>Direct</dd>
+        <dt>Option</dt><dd>Growth</dd>
+      </dl>
+    </div>
+  </div>
+  <div class="detail-card">
+    <div class="card-head"><h3>Performance & Risk</h3><span>Illustrative until production data is connected</span></div>
+    <div class="riskgrid">
+      <div><small>Alpha</small><b>—</b></div><div><small>Beta</small><b>—</b></div>
+      <div><small>Sharpe</small><b>—</b></div><div><small>Sortino</small><b>—</b></div>
+      <div><small>Volatility</small><b>—</b></div><div><small>Max Drawdown</small><b>—</b></div>
+    </div>
+  </div>
+  <p class="disclaimer">NAV and historical NAV are fetched from the configured NAV API. Other analytics require verified production data sources.</p>
+</section>
 <section id="fundDetail" class="detail">
   <div class="detail-top">
     <div>
@@ -79,7 +122,67 @@
       <div class="detail-card"><h3>Top Holdings</h3><ol class="holdings"><li>ICICI Bank <b>8.4%</b></li><li>HDFC Bank <b>7.1%</b></li><li>Reliance Industries <b>6.5%</b></li><li>Infosys <b>4.8%</b></li><li>Larsen & Toubro <b>4.2%</b></li></ol></div>
     </aside>
   </div>
-  <p class="disclaimer">Illustrative analytics and portfolio figures shown in this MVP are sample values. Production figures must come from verified, current and appropriately licensed/authorized sources.</p>
+  
+<div class="research-suite">
+  <div class="research-title">
+    <div><p class="eyebrow">FUNDWISE RESEARCH</p><h3>Deeper fund analysis</h3></div>
+    <span>Decision-support analytics — not a recommendation</span>
+  </div>
+
+  <div class="research-tabs">
+    <button class="r-tab active" onclick="showResearch('overview',this)">Overview</button>
+    <button class="r-tab" onclick="showResearch('portfolio',this)">Portfolio X-Ray</button>
+    <button class="r-tab" onclick="showResearch('risk',this)">Risk & Consistency</button>
+    <button class="r-tab" onclick="showResearch('compare',this)">Compare</button>
+  </div>
+
+  <div id="research-overview" class="research-panel">
+    <div class="score-grid">
+      <div class="fund-score"><small>FUNDWISE SCORE</small><b id="fwScore">8.4</b><span>/ 10</span><div class="score-ring"><i id="scoreFill"></i></div></div>
+      <div><small>Consistency</small><div class="mini-meter"><i style="width:88%"></i></div><b>8.8/10</b></div>
+      <div><small>Risk-adjusted return</small><div class="mini-meter"><i style="width:82%"></i></div><b>8.2/10</b></div>
+      <div><small>Downside protection</small><div class="mini-meter"><i style="width:79%"></i></div><b>7.9/10</b></div>
+      <div><small>Cost efficiency</small><div class="mini-meter"><i style="width:85%"></i></div><b>8.5/10</b></div>
+    </div>
+    <div class="growth-card">
+      <div class="card-head"><h3>₹10,000 Growth</h3><span>Illustrative 5-year comparison</span></div>
+      <div class="growth-values"><div><small>Fund</small><b id="growthFund">₹23,100</b></div><div><small>Benchmark</small><b id="growthBench">₹20,900</b></div><div><small>Category</small><b id="growthCat">₹21,700</b></div></div>
+      <div class="growth-bars"><div><span>Fund</span><i id="barFund"></i></div><div><span>Benchmark</span><i id="barBench"></i></div><div><span>Category</span><i id="barCat"></i></div></div>
+    </div>
+  </div>
+
+  <div id="research-portfolio" class="research-panel" hidden>
+    <div class="xray-grid">
+      <div class="detail-card"><h3>Asset Allocation</h3><div class="donut"><i></i><b id="equityPct">95%</b></div><div class="legend"><span>Equity <b>95%</b></span><span>Debt/Cash <b>5%</b></span></div></div>
+      <div class="detail-card"><h3>Market Cap</h3><div class="capbar"><i style="width:64%"></i><i style="width:21%"></i><i style="width:10%"></i><i style="width:5%"></i></div><div class="legend"><span>Large <b>64%</b></span><span>Mid <b>21%</b></span><span>Small <b>10%</b></span><span>Other <b>5%</b></span></div></div>
+      <div class="detail-card"><h3>Top Holdings</h3><ol class="holdings"><li>ICICI Bank <b>8.4%</b></li><li>HDFC Bank <b>7.1%</b></li><li>Reliance Industries <b>6.5%</b></li><li>Infosys <b>4.8%</b></li><li>Larsen & Toubro <b>4.2%</b></li></ol></div>
+      <div class="detail-card"><h3>Sector Exposure</h3><div class="sector"><span>Financial Services <b>27%</b></span><i style="width:27%"></i><span>Technology <b>12%</b></span><i style="width:12%"></i><span>Industrials <b>10%</b></span><i style="width:10%"></i><span>Consumer <b>9%</b></span><i style="width:9%"></i></div></div>
+    </div>
+  </div>
+
+  <div id="research-risk" class="research-panel" hidden>
+    <div class="consistency-grid">
+      <div class="detail-card"><h3>Rolling Return Consistency</h3><div class="big-stat">78% <small>of 5Y rolling periods beat benchmark</small></div><div class="timeline"><i style="width:78%"></i></div><p>Use rolling periods to reduce the distortion caused by selecting a single start date.</p></div>
+      <div class="detail-card"><h3>Maximum Drawdown</h3><div class="drawdown"><b>-17.3%</b><span>Fund</span><b>-22.4%</b><span>Benchmark</span></div><p>Lower drawdown indicates better historical downside containment, but does not predict future losses.</p></div>
+    </div>
+    <div class="detail-card"><h3>Return vs Risk</h3><div class="riskmatrix"><div class="dot d1">Fund</div><div class="axis x">Risk →</div><div class="axis y">Return ↑</div></div></div>
+  </div>
+
+  <div id="research-compare" class="research-panel" hidden>
+    <div class="compare-pro"><select id="proA"></select><select id="proB"></select><button onclick="runProCompare()">Compare</button></div>
+    <div id="proCompareTable" class="pro-table"></div>
+  </div>
+</div>
+<p class="disclaimer">Illustrative analytics and portfolio figures shown in this MVP are sample values. Production figures must come from verified, current and appropriately licensed/authorized sources.</p>
+</section>
+
+<section class="sources">
+ <div class="head"><h2>Data & Methodology</h2><span>Transparency first</span></div>
+ <div class="source-grid">
+  <div><b>NAV & history</b><p>Fetched through the FundWise data service. AMFI publishes scheme NAVs daily and provides NAV history downloads.</p><a href="https://www.amfiindia.com/net-asset-value/nav-download" target="_blank" rel="noopener">AMFI NAV resources →</a></div>
+  <div><b>Portfolio disclosures</b><p>Portfolio data should be ingested from verified AMC/AMFI disclosures. SEBI's 2026 Master Circular requires monthly portfolio disclosure with ISINs within the prescribed timeline.</p><a href="https://www.amfiindia.com/online-center/portfolio-disclosure" target="_blank" rel="noopener">AMFI portfolio disclosures →</a></div>
+  <div><b>Research methodology</b><p>CAGR, volatility, Sharpe and drawdown are calculated from NAV history. Benchmark and portfolio metrics are not fabricated when verified data is unavailable.</p></div>
+ </div>
 </section>
 </main>
 <footer><b>FundWise</b><span>Mutual fund research & education platform.</span><small>Demo data is illustrative. FundWise is not providing investment advice in this MVP.</small></footer>
