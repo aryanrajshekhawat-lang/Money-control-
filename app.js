@@ -56,3 +56,25 @@ async function loadLiveFund(){
   }
 }
 loadLiveFund();
+
+// Fund detail NAV history chart
+async function loadNAVHistory(){
+ const canvas=document.getElementById("navChart"),ctx=canvas.getContext("2d");
+ try{
+   const r=await fetch(`${MF_API}/${FEATURED_SCHEME}`);
+   const j=await r.json();
+   const rows=(j.data||[]).slice(0,260).reverse();
+   const vals=rows.map(x=>Number(x.nav)).filter(Number.isFinite);
+   if(vals.length<2) throw new Error("No history");
+   const d=devicePixelRatio||1,w=canvas.clientWidth,h=canvas.clientHeight;
+   canvas.width=w*d;canvas.height=h*d;ctx.scale(d,d);
+   const min=Math.min(...vals),max=Math.max(...vals),pad=20;
+   ctx.beginPath();
+   vals.forEach((v,i)=>{const x=i*(w/(vals.length-1)),y=h-pad-((v-min)/(max-min||1))*(h-pad*2);i?ctx.lineTo(x,y):ctx.moveTo(x,y)});
+   ctx.lineWidth=3;ctx.strokeStyle="#0b8a60";ctx.stroke();
+   ctx.lineTo(w,h);ctx.lineTo(0,h);ctx.closePath();ctx.globalAlpha=.08;ctx.fillStyle="#0b8a60";ctx.fill();ctx.globalAlpha=1;
+   document.getElementById("detailNav").textContent="₹"+Number(rows[rows.length-1].nav).toFixed(4);
+   document.getElementById("detailDate").textContent="NAV date: "+rows[rows.length-1].date;
+ }catch(e){console.error(e)}
+}
+loadNAVHistory(); addEventListener("resize",loadNAVHistory);

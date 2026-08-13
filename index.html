@@ -39,6 +39,48 @@
 <div class="calc"><div><label>Monthly SIP</label><input id="sip" type="number" value="10000"></div><div><label>Expected return %</label><input id="rate" type="number" value="12"></div><div><label>Years</label><input id="years" type="number" value="10"></div><button onclick="sipCalc()">Calculate</button><div class="answer"><small>Estimated value</small><b id="sipOut">₹23.23 Lakh</b></div></div></section>
 
 <section id="learn" class="learn"><div class="head"><h2>Learn Mutual Funds</h2></div><div class="articles"><article><b>NAV vs return: what should you actually look at?</b><small>Fund basics · 5 min read</small></article><article><b>Why risk-adjusted return matters</b><small>Research · 6 min read</small></article><article><b>SIP, lumpsum and the power of compounding</b><small>Investing · 4 min read</small></article></div></section>
+
+<section id="fundDetail" class="detail">
+  <div class="detail-top">
+    <div>
+      <p class="eyebrow">FUND DETAIL</p>
+      <h2 id="detailName">ICICI Prudential Flexicap Fund</h2>
+      <p id="detailMeta">Direct Plan · Growth · Flexi Cap</p>
+    </div>
+    <div class="navbox"><small>Latest NAV</small><b id="detailNav">Loading…</b><span id="detailDate">—</span></div>
+  </div>
+  <div class="metrics">
+    <div><small>1Y RETURN</small><b class="green">14.82%</b></div>
+    <div><small>3Y CAGR</small><b class="green">18.26%</b></div>
+    <div><small>5Y CAGR</small><b class="green">17.91%</b></div>
+    <div><small>AUM</small><b>₹75,000 Cr</b></div>
+    <div><small>EXPENSE RATIO</small><b>0.74%</b></div>
+    <div><small>RISK</small><b>Very High</b></div>
+  </div>
+
+  <div class="detail-grid">
+    <div class="detail-main">
+      <div class="detail-card">
+        <div class="card-head"><h3>Historical NAV</h3><select id="period"><option>1 Year</option><option>3 Years</option><option>5 Years</option></select></div>
+        <div class="chart-large"><canvas id="navChart"></canvas></div>
+      </div>
+      <div class="detail-card">
+        <div class="card-head"><h3>Performance</h3><span>Annualised</span></div>
+        <div class="perf"><div><span>1 Year</span><b>14.82%</b></div><div><span>3 Years</span><b>18.26%</b></div><div><span>5 Years</span><b>17.91%</b></div><div><span>10 Years</span><b>16.84%</b></div></div>
+      </div>
+      <div class="detail-card">
+        <div class="card-head"><h3>Risk & Return Analysis</h3><span>Illustrative</span></div>
+        <div class="riskgrid"><div><small>Alpha</small><b>2.84%</b></div><div><small>Beta</small><b>0.91</b></div><div><small>Sharpe</small><b>1.12</b></div><div><small>Sortino</small><b>1.58</b></div><div><small>Volatility</small><b>14.7%</b></div><div><small>Max Drawdown</small><b>-17.3%</b></div></div>
+      </div>
+    </div>
+    <aside>
+      <div class="detail-card"><h3>Fund Information</h3><dl><dt>Fund House</dt><dd>ICICI Prudential Mutual Fund</dd><dt>Category</dt><dd>Flexi Cap</dd><dt>Benchmark</dt><dd>NIFTY 500 TRI</dd><dt>Fund Manager</dt><dd>Fund manager details</dd><dt>Inception</dt><dd>May 1998</dd><dt>Plan</dt><dd>Direct</dd><dt>Option</dt><dd>Growth</dd></dl></div>
+      <div class="detail-card"><h3>Asset Allocation</h3><div class="alloc"><div><span>Large Cap</span><b>64%</b></div><div><span>Mid Cap</span><b>21%</b></div><div><span>Small Cap</span><b>10%</b></div><div><span>Cash/Others</span><b>5%</b></div></div></div>
+      <div class="detail-card"><h3>Top Holdings</h3><ol class="holdings"><li>ICICI Bank <b>8.4%</b></li><li>HDFC Bank <b>7.1%</b></li><li>Reliance Industries <b>6.5%</b></li><li>Infosys <b>4.8%</b></li><li>Larsen & Toubro <b>4.2%</b></li></ol></div>
+    </aside>
+  </div>
+  <p class="disclaimer">Illustrative analytics and portfolio figures shown in this MVP are sample values. Production figures must come from verified, current and appropriately licensed/authorized sources.</p>
+</section>
 </main>
 <footer><b>FundWise</b><span>Mutual fund research & education platform.</span><small>Demo data is illustrative. FundWise is not providing investment advice in this MVP.</small></footer>
 <script src="app.js"></script>
