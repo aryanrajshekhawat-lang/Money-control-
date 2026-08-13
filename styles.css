@@ -25,3 +25,5 @@
 .search-result-link{display:block!important;padding:10px 14px;border-bottom:1px solid #eee;text-decoration:none;color:#1d2b33;background:#fff}
 .search-result-link b{display:block;font-size:12px}
 .search-result-link small{display:block;color:#74818a;margin-top:3px}
+
+.chart-controls{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}.chart-controls .period{padding:7px 11px;border:1px solid #d8e1df;background:#fff;border-radius:6px;font-weight:700;font-size:12px;cursor:pointer}.chart-controls .period.active{background:#0b8a60;color:#fff;border-color:#0b8a60}.period-
