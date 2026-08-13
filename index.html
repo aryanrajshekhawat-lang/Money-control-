@@ -1,95 +1,43 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MarketPulse — Markets, Stocks & Mutual Funds</title>
-  <link rel="stylesheet" href="styles.css">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>FundWise — Mutual Fund Research</title>
+<link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <header class="topbar">
-    <div class="brand">Market<span>Pulse</span></div>
-    <div class="search"><input id="searchInput" placeholder="Search stocks, mutual funds, indices..." autocomplete="off"><div id="searchResults"></div></div>
-    <button class="login">Sign In</button>
-  </header>
+<header>
+  <div class="brand">Fund<span>Wise</span></div>
+  <div class="search"><input id="search" placeholder="Search mutual funds, AMCs, categories..."><div id="results"></div></div>
+  <button class="signin">Sign In</button>
+</header>
+<nav><a class="active" href="#home">Home</a><a href="#funds">Explore Funds</a><a href="#compare">Compare</a><a href="#screener">Screener</a><a href="#calculators">Calculators</a><a href="#learn">Learn</a></nav>
 
-  <nav class="nav">
-    <a class="active" href="#markets">Markets</a>
-    <a href="#stocks">Stocks</a>
-    <a href="#mutualfunds">Mutual Funds</a>
-    <a href="#ipo">IPO</a>
-    <a href="#news">News</a>
-    <a href="#tools">Tools</a>
-  </nav>
+<main id="home">
+<section class="hero">
+ <div><p class="eyebrow">MUTUAL FUND RESEARCH PLATFORM</p><h1>Invest with better<br><span>fund intelligence.</span></h1>
+ <p class="sub">Research mutual funds, compare schemes, understand risk and calculate your SIP — all in one place.</p>
+ <div class="hero-search"><input id="heroSearch" placeholder="Search a fund, e.g. Flexi Cap"><button onclick="runHeroSearch()">Search</button></div></div>
+ <div class="hero-card"><small>Featured research</small><h3>What makes a good mutual fund?</h3><div class="score"><b>Consistency</b><strong>8.6/10</strong></div><div class="bar"><i style="width:86%"></i></div><div class="score"><b>Risk-adjusted return</b><strong>8.1/10</strong></div><div class="bar"><i style="width:81%"></i></div><p>Compare returns with risk, benchmark and category — not returns alone.</p></div>
+</section>
 
-  <main>
-    <section class="ticker">
-      <div><small>NIFTY 50</small><strong>24,836.30</strong><em class="up">+0.42%</em></div>
-      <div><small>SENSEX</small><strong>81,441.20</strong><em class="up">+0.38%</em></div>
-      <div><small>BANK NIFTY</small><strong>55,102.75</strong><em class="down">-0.16%</em></div>
-      <div><small>USD/INR</small><strong>87.18</strong><em class="down">-0.08%</em></div>
-      <div><small>GOLD</small><strong>₹1,01,240</strong><em class="up">+0.21%</em></div>
-    </section>
+<section class="quick">
+<div><small>FUNDS TRACKED</small><b>1,500+</b></div><div><small>AMCs</small><b>40+</b></div><div><small>CATEGORIES</small><b>30+</b></div><div><small>TOOLS</small><b>10+</b></div>
+</section>
 
-    <section id="markets" class="hero-grid">
-      <div class="panel market-panel">
-        <div class="panel-head"><h2>Market Overview</h2><span>Demo data</span></div>
-        <div class="market-tabs"><button class="selected">NIFTY</button><button>SENSEX</button><button>BANK NIFTY</button></div>
-        <div class="price-row"><div><div class="big-price">24,836.30</div><div class="up">▲ 103.45 (0.42%)</div></div><div class="session">Market closed<br><small>Last updated 3:30 PM</small></div></div>
-        <div class="chart-wrap"><canvas id="chart"></canvas></div>
-      </div>
-      <div class="panel">
-        <div class="panel-head"><h2>Top Movers</h2><span>Today</span></div>
-        <div id="movers"></div>
-      </div>
-    </section>
+<section id="funds"><div class="head"><h2>Popular Mutual Funds</h2><a href="#screener">Explore all →</a></div><div class="fundgrid" id="fundGrid"></div></section>
 
-    <section id="stocks" class="section">
-      <div class="section-head"><h2>Popular Stocks</h2><a href="#">View all →</a></div>
-      <div class="cards" id="stocksGrid"></div>
-    </section>
+<section id="compare" class="block"><div class="head"><h2>Compare Funds</h2><span>Select funds to compare side by side</span></div>
+<div class="comparebox"><select id="fundA"></select><select id="fundB"></select><button onclick="compareFunds()">Compare</button></div><div id="comparison"></div></section>
 
-    <section id="mutualfunds" class="section">
-      <div class="section-head"><h2>Mutual Funds</h2><a href="#">Explore funds →</a></div>
-      <div class="fund-table">
-        <div class="fund-row head"><span>Fund</span><span>1Y Return</span><span>3Y CAGR</span><span>Rating</span></div>
-        <div class="fund-row"><span>Flexi Cap Fund</span><b class="up">+14.82%</b><b class="up">18.26%</b><span>★★★★★</span></div>
-        <div class="fund-row"><span>Large & Mid Cap Fund</span><b class="up">+16.40%</b><b class="up">19.11%</b><span>★★★★☆</span></div>
-        <div class="fund-row"><span>Value Discovery Fund</span><b class="up">+11.94%</b><b class="up">17.38%</b><span>★★★★★</span></div>
-        <div class="fund-row"><span>Balanced Advantage Fund</span><b class="up">+10.62%</b><b class="up">12.87%</b><span>★★★★☆</span></div>
-      </div>
-    </section>
+<section id="screener" class="block"><div class="head"><h2>Mutual Fund Screener</h2><span>Filter funds by what matters to you</span></div>
+<div class="filters"><select id="cat"><option value="">All categories</option><option>Flexi Cap</option><option>Large Cap</option><option>Mid Cap</option><option>Small Cap</option><option>Hybrid</option></select><select id="sort"><option value="return">1Y return</option><option value="three">3Y CAGR</option><option value="risk">Risk</option></select><button onclick="screenFunds()">Apply</button></div><div class="table" id="screenTable"></div></section>
 
-    <section id="ipo" class="section two-col">
-      <div class="panel">
-        <div class="section-head"><h2>IPO Watch</h2><a href="#">All IPOs →</a></div>
-        <div class="ipo-card"><div><b>Example Technologies Ltd.</b><small>Issue closes 18 Aug 2026</small></div><strong>₹680–715</strong><span class="tag">OPEN</span></div>
-        <div class="ipo-card"><div><b>Consumer Growth Ltd.</b><small>Expected listing 21 Aug 2026</small></div><strong>₹410–430</strong><span class="tag grey">UPCOMING</span></div>
-      </div>
-      <div class="panel" id="news">
-        <div class="section-head"><h2>Latest Market News</h2><a href="#">More →</a></div>
-        <article><b>Markets edge higher as investors track earnings and global cues</b><small>2 hours ago · Markets</small></article>
-        <article><b>Mutual fund flows remain resilient amid changing market valuations</b><small>4 hours ago · Mutual Funds</small></article>
-        <article><b>Banking stocks in focus after latest credit-growth data</b><small>6 hours ago · Banking</small></article>
-      </div>
-    </section>
+<section id="calculators" class="block"><div class="head"><h2>SIP Calculator</h2><span>Illustrative calculation</span></div>
+<div class="calc"><div><label>Monthly SIP</label><input id="sip" type="number" value="10000"></div><div><label>Expected return %</label><input id="rate" type="number" value="12"></div><div><label>Years</label><input id="years" type="number" value="10"></div><button onclick="sipCalc()">Calculate</button><div class="answer"><small>Estimated value</small><b id="sipOut">₹23.23 Lakh</b></div></div></section>
 
-    <section id="tools" class="section">
-      <div class="section-head"><h2>Financial Calculators</h2></div>
-      <div class="calculator">
-        <div><label>Monthly SIP (₹)</label><input id="sip" type="number" value="10000"></div>
-        <div><label>Expected return (%)</label><input id="rate" type="number" value="12"></div>
-        <div><label>Period (years)</label><input id="years" type="number" value="10"></div>
-        <button onclick="calculateSIP()">Calculate</button>
-        <div class="result"><small>Estimated value</small><strong id="sipResult">₹23.23 Lakh</strong></div>
-      </div>
-    </section>
-  </main>
-
-  <footer>
-    <b>MarketPulse</b><span>Independent financial information platform demo.</span>
-    <small>Market prices and fund returns shown here are sample data and are not investment advice.</small>
-  </footer>
-  <script src="app.js"></script>
-</body>
-</html>
+<section id="learn" class="learn"><div class="head"><h2>Learn Mutual Funds</h2></div><div class="articles"><article><b>NAV vs return: what should you actually look at?</b><small>Fund basics · 5 min read</small></article><article><b>Why risk-adjusted return matters</b><small>Research · 6 min read</small></article><article><b>SIP, lumpsum and the power of compounding</b><small>Investing · 4 min read</small></article></div></section>
+</main>
+<footer><b>FundWise</b><span>Mutual fund research & education platform.</span><small>Demo data is illustrative. FundWise is not providing investment advice in this MVP.</small></footer>
+<script src="app.js"></script>
+</body></html>
