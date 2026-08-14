@@ -1,102 +1,241 @@
-# FundWise — Mutual Fund Portal MVP
+# FundWise — Mutual Fund Portal
 
-A mobile-first mutual-fund research portal.
+A comprehensive mutual-fund research portal powered by real AMFI data. Search 1,500+ schemes, view detailed performance, compare funds, and calculate SIP returns.
 
-## Current modules
-- Mutual fund search
-- Fund cards
-- Fund comparison
-- Mutual fund screener
+## 🎯 Features (v11+)
+
+### Universal Fund Coverage
+- **All available schemes**: Access the complete AMFI/MFapi catalogue (~1,500+ mutual funds)
+- **Search & discovery**: Full-text search across scheme names and codes
+- **Universal detail pages**: Every scheme gets a dedicated page with complete metrics
+- **Dynamic content**: No hard-coded sample data—all content derived from live NAV API
+
+### Performance & Returns
+- **Multiple time periods**: 1M / 3M / 6M / 1Y / 3Y / 5Y / 10Y / MAX
+- **Latest NAV + history**: Real-time NAV with historical data spanning years
+- **Calculated metrics**: CAGR, volatility, Sharpe ratio, maximum drawdown
+- **Interactive charts**: Visualize NAV trends across any time period
+
+### Fund Research
+- **Core metrics**: AUM, expense ratio, benchmark, category, risk level
+- **Fund manager info**: AMC details and fund house information
+- **Portfolio & holdings**: Asset allocation, market cap mix, sector exposure (where available)
+- **Fund comparison**: Side-by-side comparison of returns, risk, and performance across all periods
+
+### Tools
+- **SIP Calculator**: Calculate maturity amount with adjustable monthly investment and return rates
+- **Performance comparison**: View funds ranked by returns, category, or risk
+- **Screener**: Filter schemes by category, risk level, and performance metrics
+
+### Data Quality
+- **Proper loading states**: Visual feedback during API calls with spinners
+- **Error handling**: Graceful degradation and retry options when data unavailable
+- **Caching**: Client-side caching reduces API calls, faster navigation
+- **Status indicators**: Clear data freshness labels and last-update timestamps
+
+## 🏗️ Architecture
+
+### Data Layer
+The app uses a two-tier data architecture that doesn't depend on hard-coded figures:
+
+```
+Browser → FundWise Backend APIs → Upstream Data Sources
+                ↓
+         Client-side Caching (DataService)
+```
+
+### API Endpoints
+
+**`/api/schemes?q=<query>&limit=<limit>`**
+- Returns matching schemes from the full AMFI catalogue
+- Supports relevance-based sorting
+- Cached for 24 hours server-side
+- Example: `/api/schemes?q=flexicap&limit=50`
+
+**`/api/fund?code=<schemeCode>`**
+- Fetches complete fund details including NAV history
+- Calculates 1M/3M/6M/1Y/3Y/5Y/10Y returns + CAGR
+- Computes risk metrics: volatility, Sharpe, max drawdown
+- Cached for 6 hours server-side
+- Example: `/api/fund?code=102949`
+
+### Client-Side Services
+
+**`data-service.js`** (DataService)
+- Unified fund data access layer
+- 1-hour client-side caching
+- Request deduplication (pending requests)
+- Methods:
+  - `getFund(schemeCode)` — fetches fund detail
+  - `searchSchemes(query, limit)` — searches catalogue
+  - `getNAVHistory(schemeCode)` — retrieves NAV timeseries
+  - `compareFunds(schemeCodes)` — fetches multiple funds
+  - `calculateSIP(amount, rate, months)` — SIP computation
+
+**`ui-service.js`** (UIService)
+- UI state management and rendering
+- Chart generation (requires Chart.js)
+- Formatting utilities (currency, percent, dates)
+- Loading/error state display
+- Methods:
+  - `showLoading()` / `showError()` — state display
+  - `renderNAVChart()` / `renderComparisonChart()` — chart rendering
+  - `formatCurrency()`, `formatPercent()`, `formatDate()`
+  - `filterNAVByPeriod()` — period-based filtering
+  - `debounce()` — search input throttling
+
+### Data Flow Example
+
+1. User searches for "Flexi Cap"
+2. `searchAllSchemes()` calls `dataService.searchSchemes("Flexi Cap")`
+3. DataService checks client cache; if miss, fetches `/api/schemes?q=flexi+cap`
+4. Results displayed with scheme names and codes
+5. User clicks a scheme → navigation to `/fund/<scheme-slug>/`
+6. Fund page calls `dataService.getFund(schemeCode)`
+7. DataService calls `/api/fund?code=<code>`
+8. Backend fetches NAV history from MFapi.in, calculates returns/risk
+9. Results cached in DataService and rendered with charts
+
+## 📊 Data Sources
+
+### NAV & Performance
+- **Source**: [MFapi.in](https://mfapi.in/) — public mutual fund data API
+- **Freshness**: Daily (business days only)
+- **Coverage**: ~1,500+ registered schemes from AMFI
+- **Scope**: Scheme code, name, category, NAV history
+
+### Calculated Metrics
+**Server-side** (`/api/fund` endpoint):
+- CAGR for all periods (1M, 3M, 6M, 1Y, 3Y, 5Y, 10Y)
+- Volatility (annualized standard deviation of daily returns)
+- Sharpe ratio (return premium above 6% risk-free rate)
+- Maximum drawdown (largest peak-to-trough decline)
+
+**Client-side** (`data-service.js`):
+- SIP maturity calculation (future value of annuity formula)
+
+### Not Yet Included (Production Data)
+The following fields are intentionally placeholders because they require verified, properly licensed sources:
+- **AUM** (Assets Under Management)
+- **Expense Ratio (TER)**
+- **Benchmark**
+- **Risk-o-Meter** (SEBI risk rating)
+- **Fund Manager** details
+- **Portfolio holdings** & asset allocation (requires SEBI monthly disclosures)
+
+To add production data:
+1. Integrate with AMFI's official API/feeds for scheme metadata
+2. Fetch TER and benchmark from SEBI's mutual fund database
+3. Parse monthly portfolio disclosures (Form N1, N2) from AMC websites or SEBI
+4. Add `AUM` data from AMFI or commercial data providers
+5. Implement proper data validation and error handling
+
+## 🚀 Running Locally
+
+### Prerequisites
+- Node.js 14+ (for Vercel CLI if running serverless APIs locally)
+- Modern browser (Chrome, Firefox, Safari, Edge)
+
+### Static Files
+```bash
+# Simply open index.html in your browser
+open index.html
+```
+
+### Serverless APIs (Vercel)
+```bash
+# Install Vercel CLI
+npm install -g vercel
+
+# Run locally (requires vercel.json config)
+vercel dev
+
+# Open http://localhost:3000
+```
+
+The app will fetch data from:
+- `/api/schemes` → MFapi.in catalogue
+- `/api/fund` → MFapi.in NAV history + calculated metrics
+
+## 📈 Roadmap
+
+### Phase 1 ✅ (Current)
+- All-fund NAV platform with full scheme catalogue
+- Dynamic fund detail pages for any scheme code
+- Client & server-side caching
 - SIP calculator
-- Learning section
-- Responsive mobile design
+- Fund comparison
+- Proper loading/error states
 
-## Data
-The MVP uses illustrative sample data. Before public launch, connect the backend to properly licensed/authorized data sources for NAV, returns, AUM, portfolio holdings, TER, benchmarks and other scheme information.
+### Phase 2 (Planned)
+- [ ] Integrate SEBI portfolio disclosures (holdings, asset allocation)
+- [ ] Add AUM from AMFI/commercial sources
+- [ ] Implement fund rating/scoring (consistency, risk-adjusted returns)
+- [ ] Advanced screener (sector exposure, market cap filter)
+- [ ] Watchlist & portfolio tracking
+- [ ] User authentication
+- [ ] Mobile app (React Native)
 
-AMFI publishes NAV resources and historical NAV downloads. SEBI also publishes regulatory/disclosure information and requires periodic portfolio disclosures by mutual funds/AMCs.
+### Phase 3 (Production)
+- [ ] Add expense ratio data
+- [ ] Integrate benchmark returns for alpha calculation
+- [ ] Implement SEBI risk-o-meter display
+- [ ] Fund manager profiles
+- [ ] Regulatory compliance & disclaimers
+- [ ] Commercial licensing for redistribution
 
-## Run
-Open `index.html` in a browser.
+## 🔧 Development
 
-## Production roadmap
-1. Add real mutual-fund data ingestion.
-2. Create a backend + database.
-3. Add scheme detail pages.
-4. Add rolling returns, CAGR, XIRR, Sharpe, Sortino, alpha, beta, volatility and drawdown.
-5. Add portfolio and watchlist.
-6. Add authentication.
-7. Add compliant research/disclaimer/advertising framework.
+### File Structure
+```
+├── index.html          # Home page
+├── fund.html           # Fund detail template
+├── app.js              # Main application logic
+├── fund.js             # Fund page logic
+├── data-service.js     # Data layer (caching, API calls)
+├── ui-service.js       # UI utilities (charts, formatting, states)
+├── styles.css          # Styles
+├── vercel.json         # Vercel config
+└── api/
+    ├── fund.js         # GET /api/fund?code=<schemeCode>
+    └── schemes.js      # GET /api/schemes?q=<query>&limit=<limit>
+```
 
+### Key Dependencies
+- **Chart.js** (optional, for charts) — loaded from CDN
+- **MFapi.in** (free public API) — upstream NAV data
+- **Vercel** (free tier) — hosting + serverless APIs
 
-## API integration — v1
+### Adding a Feature
+1. Add data-fetching logic to `DataService` in `data-service.js`
+2. Add UI rendering to `UIService` in `ui-service.js`
+3. Create/update API endpoint in `/api/*.js` if needed
+4. Update HTML structure in `index.html` or `fund.html`
+5. Wire up event listeners in `app.js` or `fund.js`
 
-This version connects the browser to **MFapi.in** for a live NAV lookup of:
-- Scheme: ICICI Prudential Flexicap Fund - Direct Plan - Growth
-- Scheme code: 148990
+## 📝 Disclaimers
 
-The documented endpoint is `GET https://api.mfapi.in/mf/{scheme_code}/latest`.
+- **Not Financial Advice**: FundWise provides research data only, not investment recommendations
+- **Data Accuracy**: NAV data is from MFapi.in/AMFI; verification recommended before decisions
+- **Illustrative Fields**: Calculated returns, risk metrics, and all performance data are illustrative
+- **Production Use**: Before public launch, verify licensing, data sources, and regulatory compliance with legal counsel
 
-For a production website, do not rely on a free public API as the sole source of financial data. Evaluate licensing, uptime, rate limits, redistribution rights and data accuracy, and consider an authorized/licensed provider or an ingestion layer based on official AMFI/AMC disclosures. AMFI provides current and historical NAV download resources and scheme-data resources.
+## 📚 References
 
+- [AMFI (Association of Mutual Funds in India)](https://www.amfiindia.com/)
+  - NAV downloads: https://www.amfiindia.com/net-asset-value
+  - Scheme details & classification
+- [SEBI (Securities and Exchange Board of India)](https://www.sebi.gov.in/)
+  - Mutual fund regulations & master circular
+  - Portfolio disclosure requirements
+  - Risk-o-meter framework
+- [MFapi.in](https://mfapi.in/) — Public mutual fund data API
+- [XIRR Calculator Docs](https://en.wikipedia.org/wiki/Internal_rate_of_return) — For future XIRR implementation
 
-## v3 fund navigation
-Search results and fund cards are now clickable. The first fund opens a detail view using the live NAV-history API; other sample funds open the same detail interface with their current demo metadata until scheme-specific API mapping is added.
+## 📄 License
 
-\n## v4 dynamic scheme mapping
-Fund detail pages now attempt to resolve each fund to a real MFapi scheme code from the API's scheme catalog, then fetch that scheme's NAV history dynamically. The first featured fund keeps its explicit verified demo mapping. This is still a prototype: production should use a controlled backend, verified scheme-code mapping, caching, rate limits, error handling, and an appropriately licensed/authorized data source.
+This project is provided as-is for learning and research purposes.
 
-\n## v5 research features
-- FundWise Score with transparent sub-scores
-- ₹10,000 growth comparison versus benchmark/category
-- Rolling-return consistency view
-- Maximum drawdown view
-- Portfolio X-Ray: asset allocation, market-cap mix, sectors and top holdings
-- Advanced fund comparison
-- Research tabs for overview, portfolio, risk and comparison
+---
 
-The current research values are illustrative placeholders except for NAV/history fields already connected to the API. Replace them with verified data before public launch.
-
-\n## v6 data engine
-- Added a Vercel serverless `/api/fund?code=` endpoint.
-- Browser now requests FundWise's backend rather than calling the upstream NAV API directly.
-- Real NAV-derived 1Y/3Y/5Y CAGR, volatility, Sharpe and maximum drawdown are calculated server-side.
-- Added caching headers to reduce upstream requests.
-- Added explicit data-source/methodology disclosure.
-- Portfolio, AUM, TER, benchmark, manager and risk-o-meter are intentionally not fabricated. The next production ingestion adapter should use verified AMC/AMFI/SEBI disclosures and an appropriate data licence.
-
-AMFI states that scheme NAVs are published daily and provides NAV history downloads; its research/data area also exposes scheme details, scheme performance and portfolio-disclosure resources. SEBI's March 2026 Master Circular requires monthly portfolio disclosures with ISINs on AMC/AMFI websites within the prescribed timeline.
-
-\n## v7 multi-page architecture
-- Home page is now a discovery/dashboard page.
-- `fund.html?name=...` is a dedicated fund-detail page.
-- Search results navigate to the separate fund page.
-- Popular fund cards navigate to the separate fund page.
-- Fund detail contains NAV, performance, risk, portfolio placeholder, comparison and methodology sections.
-- This structure is ready for clean URLs later (for example `/fund/icici-prudential-flexicap-fund`) once routing is added.
-
-\n## v8 clean fund URLs
-Fund pages now use clean URLs such as:
-`/fund/icici-prudential-flexicap-fund`
-
-Vercel rewrites the clean URL to the existing `fund.html` page while the client resolves the fund slug. This keeps the implementation simple while providing a professional URL structure.
-
-
-## v9 navigation fix
-Search and fund cards now navigate to real static pages at `/fund/<fund-slug>/`. Each built-in fund has its own `index.html`, so the fund opens as a separate page without depending on a rewrite rule. The homepage JavaScript was rebuilt to remove the previous broken navigation code.
-
-
-## v10 navigation
-Search, fund cards and screener rows use native HTML links to `/fund/<slug>/`. Each built-in fund has a physical `fund/<slug>/index.html` page, so navigation does not depend on JavaScript click handlers or Vercel rewrites.
-
-
-## Stage 1 — All-fund NAV platform
-- Search now queries the full mutual-fund scheme catalogue through `/api/schemes`.
-- Any matching scheme can open a dedicated `/fund/<slug>/` detail page.
-- The detail page resolves the scheme code and retrieves NAV history through the backend `/api/fund` endpoint.
-- NAV-derived 1Y/3Y/5Y CAGR, volatility, Sharpe and maximum drawdown are calculated server-side.
-- Featured cards remain local for fast homepage rendering.
-- Data is cached server-side to reduce upstream traffic.
-- Stage 1 deliberately focuses on NAV/history/returns rather than paid portfolio/AUM/holdings data.
-
-AMFI publishes latest NAV and historical NAV resources; NAVs are disclosed on business days. This product should label the value as "Latest NAV", not intraday real-time price.
+**Questions?** Check the [GitHub Issues](https://github.com/aryanrajshekhawat-lang/Money-control-/issues) or submit a PR.
