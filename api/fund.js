@@ -1,171 +1,509 @@
 // GET /api/fund?code=<schemeCode>
-// Fetches detailed fund data including NAV history, calculated returns and risk metrics
-import fetch from 'node-fetch';
+//
+// Universal mutual-fund detail API.
+// Uses MFAPI for NAV + historical NAV data.
+// Metadata not available from the NAV feed is returned as null.
+// Never fabricate fund information.
+
+import fetch from "node-fetch";
 
 const CACHE_TTL = 21600; // 6 hours
-const NAV_HISTORY_LIMIT = 1000; // ~4 years of business days
+const NAV_HISTORY_LIMIT = 10000;
+
+// Approximate trading-day periods
+const PERIODS = {
+  "1M": { days: 21, years: 1 / 12 },
+  "3M": { days: 63, years: 3 / 12 },
+  "6M": { days: 126, years: 6 / 12 },
+  "1Y": { days: 252, years: 1 },
+  "3Y": { days: 756, years: 3 },
+  "5Y": { days: 1260, years: 5 },
+  "10Y": { days: 2520, years: 10 },
+};
 
 export default async function handler(req, res) {
-  const schemeCode = String(req.query.code || '').trim();
-  
+  const schemeCode = String(req.query.code || "").trim();
+
   if (!schemeCode) {
-    return res.status(400).json({ error: 'scheme code required' });
+    return res.status(400).json({
+      error: "scheme code required",
+    });
   }
 
   try {
-    // Fetch latest NAV
-    const navRes = await fetch(`https://api.mfapi.in/mf/${schemeCode}/latest`);
-    if (!navRes.ok) {
-      return res.status(404).json({ error: 'scheme not found' });
-    }
-    const navData = await navRes.json();
-    const latestNav = navData.data?.[0];
-    
-    if (!latestNav) {
-      return res.status(404).json({ error: 'NAV data unavailable' });
+    const baseUrl = `https://api.mfapi.in/mf/${encodeURIComponent(
+      schemeCode
+    )}`;
+
+    // Fetch latest NAV and complete history simultaneously.
+    const [latestResponse, historyResponse] = await Promise.all([
+      fetch(`${baseUrl}/latest`),
+      fetch(baseUrl),
+    ]);
+
+    if (!latestResponse.ok) {
+      return res.status(404).json({
+        error: "scheme not found",
+      });
     }
 
-    // Fetch NAV history
-    const histRes = await fetch(`https://api.mfapi.in/mf/${schemeCode}`);
-    if (!histRes.ok) {
-      return res.status(502).json({ error: 'history unavailable' });
+    if (!historyResponse.ok) {
+      return res.status(502).json({
+        error: "NAV history unavailable",
+      });
     }
-    const histData = await histRes.json();
-    const navHistory = (histData.data || []).slice(0, NAV_HISTORY_LIMIT);
 
-    // Calculate returns and risk metrics
+    const latestData = await latestResponse.json();
+    const historyData = await historyResponse.json();
+
+    const latest = latestData.data?.[0];
+
+    if (!latest) {
+      return res.status(404).json({
+        error: "NAV data unavailable",
+      });
+    }
+
+    const navHistory = normalizeHistory(
+      historyData.data || []
+    ).slice(0, NAV_HISTORY_LIMIT);
+
     const metrics = calculateMetrics(navHistory);
 
-    // Build response
     const fundData = {
       schemeCode,
-      schemeName: navData.meta?.scheme_name || 'Unknown Scheme',
-      isin: navData.meta?.isin || null,
-      category: navData.meta?.category || 'Other',
-      
+
+      schemeName:
+        latestData.meta?.scheme_name ||
+        "Unknown Scheme",
+
+      isin:
+        latestData.meta?.isin ||
+        null,
+
+      category:
+        latestData.meta?.category ||
+        "Other",
+
+      fundHouse:
+        latestData.meta?.fund_house ||
+        null,
+
+      schemeType:
+        latestData.meta?.scheme_type ||
+        null,
+
       nav: {
-        latest: parseFloat(latestNav.nav),
-        date: latestNav.date,
-        history: navHistory.map(h => ({
-          date: h.date,
-          nav: parseFloat(h.nav)
-        }))
+        latest: Number(latest.nav),
+        date: latest.date,
+
+        history: navHistory,
       },
-      
+
       returns: metrics.returns,
+
       riskMetrics: metrics.risk,
-      
-      // Placeholders for fields requiring verified production data
+
+      /*
+       * These fields require verified AMC/AMFI
+       * disclosure data.
+       *
+       * DO NOT insert guessed values.
+       */
+
       aum: null,
+
       expenseRatio: null,
+
       benchmark: null,
+
       riskOMeter: null,
+
       fundManager: null,
-      portfolio: null
+
+      portfolio: null,
+
+      assetAllocation: null,
+
+      dataSource:
+        "MFAPI / public mutual-fund NAV data",
     };
 
-    res.setHeader('Cache-Control', `s-maxage=${CACHE_TTL}, stale-while-revalidate=86400`);
-    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader(
+      "Cache-Control",
+      `s-maxage=${CACHE_TTL}, stale-while-revalidate=86400`
+    );
+
+    res.setHeader(
+      "Access-Control-Allow-Origin",
+      "*"
+    );
+
     return res.status(200).json(fundData);
-    
-  } catch (e) {
-    console.error('Fund detail error:', e);
-    return res.status(500).json({ error: 'unable to load fund details' });
+
+  } catch (error) {
+
+    console.error(
+      "Fund detail error:",
+      error
+    );
+
+    return res.status(500).json({
+      error: "unable to load fund details",
+    });
   }
 }
 
+
+/**
+ * Convert MFAPI history into a consistent format.
+ */
+function normalizeHistory(history) {
+
+  return history
+    .map((item) => ({
+      date: item.date,
+      nav: Number(item.nav),
+    }))
+
+    .filter(
+      (item) =>
+        item.date &&
+        Number.isFinite(item.nav) &&
+        item.nav > 0
+    )
+
+    .sort(
+      (a, b) =>
+        parseDate(a.date) -
+        parseDate(b.date)
+    );
+}
+
+
+/**
+ * MFAPI normally uses DD-MM-YYYY.
+ */
+function parseDate(value) {
+
+  const parts = String(value).split("-");
+
+  if (parts.length === 3) {
+
+    const [day, month, year] =
+      parts.map(Number);
+
+    return new Date(
+      year,
+      month - 1,
+      day
+    ).getTime();
+  }
+
+  return new Date(value).getTime();
+}
+
+
+/**
+ * Calculate all performance and risk metrics.
+ */
 function calculateMetrics(navHistory) {
-  if (!navHistory || navHistory.length < 2) {
-    return { returns: {}, risk: {} };
+
+  if (navHistory.length < 2) {
+
+    return {
+      returns: {},
+      risk: {},
+    };
   }
 
-  // Sort chronologically (oldest first)
-  const sorted = [...navHistory].reverse();
-  
-  // Helper: calculate CAGR
-  const calculateCAGR = (startNav, endNav, years) => {
-    if (startNav <= 0 || years <= 0) return 0;
-    return (Math.pow(endNav / startNav, 1 / years) - 1) * 100;
-  };
+  const sorted = [...navHistory].sort(
+    (a, b) =>
+      parseDate(a.date) -
+      parseDate(b.date)
+  );
 
-  // Helper: calculate daily returns
-  const dailyReturns = [];
-  for (let i = 1; i < sorted.length; i++) {
-    const prev = parseFloat(sorted[i - 1].nav);
-    const curr = parseFloat(sorted[i].nav);
-    if (prev > 0) {
-      dailyReturns.push((curr - prev) / prev);
-    }
-  }
+  const latest =
+    sorted[sorted.length - 1].nav;
 
-  // Calculate standard deviation (volatility)
-  const volatility = dailyReturns.length > 1 ? calculateStdDev(dailyReturns) * Math.sqrt(252) : 0;
 
-  // Helper: get NAV for periods ago
-  const getNavXPeriodAgo = (days) => {
-    const idx = Math.min(days, sorted.length - 1);
-    return parseFloat(sorted[idx].nav);
-  };
+  /*
+   * ------------------------------------
+   * PERIOD RETURNS
+   * ------------------------------------
+   */
 
-  const latestNav = parseFloat(sorted[0].nav);
-  const nav1MAgo = getNavXPeriodAgo(21);
-  const nav3MAgo = getNavXPeriodAgo(63);
-  const nav6MAgo = getNavXPeriodAgo(126);
-  const nav1YAgo = getNavXPeriodAgo(252);
-  const nav3YAgo = getNavXPeriodAgo(756);
-  const nav5YAgo = getNavXPeriodAgo(1260);
-  const nav10YAgo = getNavXPeriodAgo(2520);
+  const returns = {};
 
-  const returns = {
-    '1M': latestNav > 0 ? ((latestNav - nav1MAgo) / nav1MAgo * 100).toFixed(2) : null,
-    '3M': latestNav > 0 ? ((latestNav - nav3MAgo) / nav3MAgo * 100).toFixed(2) : null,
-    '6M': latestNav > 0 ? ((latestNav - nav6MAgo) / nav6MAgo * 100).toFixed(2) : null,
-    '1Y': latestNav > 0 ? calculateCAGR(nav1YAgo, latestNav, 1).toFixed(2) : null,
-    '3Y': latestNav > 0 ? calculateCAGR(nav3YAgo, latestNav, 3).toFixed(2) : null,
-    '5Y': latestNav > 0 ? calculateCAGR(nav5YAgo, latestNav, 5).toFixed(2) : null,
-    '10Y': latestNav > 0 ? calculateCAGR(nav10YAgo, latestNav, 10).toFixed(2) : null,
-  };
+  for (const [period, config] of Object.entries(
+    PERIODS
+  )) {
 
-  // Calculate maximum drawdown
-  let maxDrawdown = 0;
-  let peak = parseFloat(sorted[0].nav);
-  for (let i = 1; i < sorted.length; i++) {
-    const current = parseFloat(sorted[i].nav);
-    if (current > peak) {
-      peak = current;
+    if (sorted.length > config.days) {
+
+      const start =
+        sorted[
+          sorted.length -
+          1 -
+          config.days
+        ].nav;
+
+      returns[period] =
+        calculateCAGR(
+          start,
+          latest,
+          config.years
+        );
+
     } else {
-      const drawdown = ((current - peak) / peak) * 100;
-      if (drawdown < maxDrawdown) {
-        maxDrawdown = drawdown;
-      }
+
+      returns[period] = null;
     }
   }
 
-  // Sharpe ratio (assuming 6% risk-free rate)
-  const sharpe = dailyReturns.length > 1 && volatility > 0
-    ? ((calculateAvg(dailyReturns) * 252 - 0.06) / volatility).toFixed(2)
-    : null;
 
-  const risk = {
-    volatility: volatility.toFixed(2),
-    maxDrawdown: maxDrawdown.toFixed(2),
-    sharpeRatio: sharpe,
-    // Sortino, Beta, Alpha require benchmark data (production)
-    sortino: null,
-    beta: null,
-    alpha: null
+  /*
+   * ------------------------------------
+   * MAX RETURN
+   * ------------------------------------
+   */
+
+  const first =
+    sorted[0].nav;
+
+  const firstDate =
+    parseDate(sorted[0].date);
+
+  const lastDate =
+    parseDate(
+      sorted[sorted.length - 1].date
+    );
+
+  const years =
+    (lastDate - firstDate) /
+    (365.25 *
+      24 *
+      60 *
+      60 *
+      1000);
+
+  returns.MAX =
+    years > 0
+      ? calculateCAGR(
+          first,
+          latest,
+          years
+        )
+      : null;
+
+
+  /*
+   * ------------------------------------
+   * DAILY RETURNS
+   * ------------------------------------
+   */
+
+  const dailyReturns = [];
+
+  for (
+    let i = 1;
+    i < sorted.length;
+    i++
+  ) {
+
+    const previous =
+      sorted[i - 1].nav;
+
+    const current =
+      sorted[i].nav;
+
+    if (previous > 0) {
+
+      dailyReturns.push(
+        (current - previous) /
+          previous
+      );
+    }
+  }
+
+
+  /*
+   * ------------------------------------
+   * VOLATILITY
+   * ------------------------------------
+   */
+
+  const volatility =
+    dailyReturns.length > 1
+      ? calculateStdDev(
+          dailyReturns
+        ) *
+        Math.sqrt(252) *
+        100
+      : null;
+
+
+  /*
+   * ------------------------------------
+   * MAXIMUM DRAWDOWN
+   * ------------------------------------
+   */
+
+  let peak =
+    sorted[0].nav;
+
+  let maxDrawdown = 0;
+
+  for (const point of sorted) {
+
+    if (point.nav > peak) {
+
+      peak = point.nav;
+    }
+
+    const drawdown =
+      ((point.nav - peak) /
+        peak) *
+      100;
+
+    if (
+      drawdown <
+      maxDrawdown
+    ) {
+
+      maxDrawdown =
+        drawdown;
+    }
+  }
+
+
+  /*
+   * ------------------------------------
+   * SHARPE RATIO
+   * ------------------------------------
+   *
+   * Assumption:
+   * Risk-free rate = 6%
+   */
+
+  const annualizedReturn =
+    dailyReturns.length
+      ? calculateAvg(
+          dailyReturns
+        ) * 252
+      : null;
+
+  const sharpe =
+    volatility !== null &&
+    volatility > 0
+      ? (
+          (annualizedReturn - 0.06) /
+          (volatility / 100)
+        ).toFixed(2)
+      : null;
+
+
+  return {
+
+    returns,
+
+    risk: {
+
+      volatility:
+        volatility === null
+          ? null
+          : volatility.toFixed(2),
+
+      maxDrawdown:
+        maxDrawdown.toFixed(2),
+
+      sharpeRatio:
+        sharpe,
+
+      /*
+       * These require benchmark
+       * return data.
+       */
+
+      sortino: null,
+
+      beta: null,
+
+      alpha: null,
+    },
   };
-
-  return { returns, risk };
 }
 
+
+/**
+ * CAGR calculation.
+ */
+function calculateCAGR(
+  startNav,
+  endNav,
+  years
+) {
+
+  if (
+    !(startNav > 0) ||
+    !(endNav > 0) ||
+    !(years > 0)
+  ) {
+
+    return null;
+  }
+
+  return Number(
+    (
+      (Math.pow(
+        endNav / startNav,
+        1 / years
+      ) - 1) *
+      100
+    ).toFixed(2)
+  );
+}
+
+
+/**
+ * Standard deviation.
+ */
 function calculateStdDev(values) {
-  if (values.length === 0) return 0;
-  const avg = calculateAvg(values);
-  const variance = values.reduce((sum, v) => sum + Math.pow(v - avg, 2), 0) / values.length;
-  return Math.sqrt(variance);
+
+  if (!values.length) {
+    return 0;
+  }
+
+  const average =
+    calculateAvg(values);
+
+  const variance =
+    values.reduce(
+      (sum, value) =>
+        sum +
+        Math.pow(
+          value - average,
+          2
+        ),
+      0
+    ) / values.length;
+
+  return Math.sqrt(
+    variance
+  );
 }
 
+
+/**
+ * Average.
+ */
 function calculateAvg(values) {
-  return values.reduce((sum, v) => sum + v, 0) / values.length;
+
+  return (
+    values.reduce(
+      (sum, value) =>
+        sum + value,
+      0
+    ) / values.length
+  );
 }
